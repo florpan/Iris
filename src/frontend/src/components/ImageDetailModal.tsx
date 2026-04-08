@@ -51,6 +51,8 @@ interface ImageDetailModalProps {
   onClose: () => void;
   /** Called when the back button is clicked; uses onClose if not provided */
   onBack?: () => void;
+  /** If true, the modal will update the URL path when navigating between images */
+  updateUrlOnNavigate?: boolean;
 }
 
 // ── Image Viewer (zoom/pan) ───────────────────────────────────────────────────
@@ -267,6 +269,7 @@ export function ImageDetailModal({
   onNavigate,
   onClose,
   onBack,
+  updateUrlOnNavigate = true,
 }: ImageDetailModalProps) {
   const [detail, setDetail] = useState<ImageDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -292,13 +295,65 @@ export function ImageDetailModal({
       .finally(() => setLoading(false));
   }, [imageId]);
 
+  // ── Preload adjacent images ──────────────────────────────────────────────────
+  // Preload next/prev 2 images in sequence so navigation is smooth.
+  // Setting Image.src triggers the browser to fetch and cache the resource.
+  useEffect(() => {
+    if (imageIds.length <= 1) return;
+
+    const preloadRange = 2;
+    const idsToPreload: number[] = [];
+    for (let i = 1; i <= preloadRange; i++) {
+      if (currentIndex - i >= 0) idsToPreload.push(imageIds[currentIndex - i]);
+      if (currentIndex + i < imageIds.length) idsToPreload.push(imageIds[currentIndex + i]);
+    }
+
+    // Keep refs so GC doesn't kill the requests mid-flight
+    const preloadImages: HTMLImageElement[] = [];
+    idsToPreload.forEach((id) => {
+      const orig = new Image();
+      orig.src = `/api/images/${id}/original`;
+      preloadImages.push(orig);
+
+      const thumb = new Image();
+      thumb.src = `/api/images/${id}/thumb`;
+      preloadImages.push(thumb);
+    });
+
+    return () => {
+      // Cancel preloads by clearing src
+      preloadImages.forEach((img) => { img.src = ""; });
+    };
+  }, [imageId, imageIds, currentIndex]);
+
+  // ── Navigate and update URL ──────────────────────────────────────────────────
+  const navigateToId = useCallback(
+    (id: number) => {
+      onNavigate(id);
+      // Update URL to reflect the new image ID while preserving context params
+      if (updateUrlOnNavigate && window.location.pathname.startsWith("/image/")) {
+        const search = window.location.search;
+        window.history.replaceState(null, "", `/image/${id}${search}`);
+      }
+    },
+    [onNavigate, updateUrlOnNavigate]
+  );
+
   const goPrev = useCallback(() => {
-    if (hasPrev) onNavigate(imageIds[currentIndex - 1]);
-  }, [hasPrev, imageIds, currentIndex, onNavigate]);
+    if (hasPrev) navigateToId(imageIds[currentIndex - 1]);
+  }, [hasPrev, imageIds, currentIndex, navigateToId]);
 
   const goNext = useCallback(() => {
-    if (hasNext) onNavigate(imageIds[currentIndex + 1]);
-  }, [hasNext, imageIds, currentIndex, onNavigate]);
+    if (hasNext) navigateToId(imageIds[currentIndex + 1]);
+  }, [hasNext, imageIds, currentIndex, navigateToId]);
+
+  const goFirst = useCallback(() => {
+    if (imageIds.length > 0) navigateToId(imageIds[0]);
+  }, [imageIds, navigateToId]);
+
+  const goLast = useCallback(() => {
+    if (imageIds.length > 0) navigateToId(imageIds[imageIds.length - 1]);
+  }, [imageIds, navigateToId]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -319,12 +374,18 @@ export function ImageDetailModal({
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
         goNext();
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        goFirst();
+      } else if (e.key === "End") {
+        e.preventDefault();
+        goLast();
       }
     };
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose, goPrev, goNext]);
+  }, [onClose, goPrev, goNext, goFirst, goLast]);
 
   // Prevent body scroll
   useEffect(() => {

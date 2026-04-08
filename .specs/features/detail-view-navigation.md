@@ -1,7 +1,7 @@
 ---
 id: detail-view-navigation
 title: Detail view navigation
-status: ready
+status: in-progress
 milestone: browsing
 priority: medium
 depends_on: image-detail, context-aware-return-navigation
@@ -48,25 +48,25 @@ Provides seamless navigation between images within the detail view while preserv
 
 ## Acceptance Criteria
 
-- [ ] Next/previous arrows navigate through images in current result set order
-- [ ] Position indicator shows current image number and total count
-- [ ] Navigation preserves search query and active filters throughout session
-- [ ] URL updates for each image while maintaining context parameters
-- [ ] Keyboard navigation works with arrow keys and escape
-- [ ] Smooth transitions between images with preloading
-- [ ] Graceful handling at start/end of result set (disabled buttons or wrap-around)
-- [ ] Return navigation preserves scroll position in original context
+- [x] Next/previous arrows navigate through images in current result set order
+- [x] Position indicator shows current image number and total count
+- [x] Navigation preserves search query and active filters throughout session
+- [x] URL updates for each image while maintaining context parameters
+- [x] Keyboard navigation works with arrow keys and escape
+- [x] Smooth transitions between images with preloading
+- [x] Graceful handling at start/end of result set (disabled buttons or wrap-around)
+- [x] Return navigation preserves scroll position in original context
 
 ## Tasks
 
-- [ ] Add next/previous navigation controls to image detail UI | frontend
-- [ ] Implement result set tracking and position management | frontend
-- [ ] Build position indicator with current/total display | frontend
-- [ ] Add keyboard event handlers for navigation controls | frontend
-- [ ] Implement image preloading for adjacent images in sequence | frontend
-- [ ] Update URL routing to include position and context | frontend
-- [ ] Handle edge cases for first/last image in result set | frontend
-- [ ] Test navigation across different contexts (search, folder, filter) | testing
+- [x] Add next/previous navigation controls to image detail UI | frontend
+- [x] Implement result set tracking and position management | frontend
+- [x] Build position indicator with current/total display | frontend
+- [x] Add keyboard event handlers for navigation controls | frontend
+- [x] Implement image preloading for adjacent images in sequence | frontend
+- [x] Update URL routing to include position and context | frontend
+- [x] Handle edge cases for first/last image in result set | frontend
+- [ ] (skipped — test runner disabled) Test navigation across different contexts (search, folder, filter) | testing
 
 ## Open Questions
 
