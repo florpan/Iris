@@ -1,7 +1,7 @@
 ---
 id: thumbnail-generation
 title: Thumbnail Generation
-status: ready
+status: in-progress
 milestone: foundation
 priority: high
 handoff: single
@@ -43,21 +43,21 @@ Example: Source "NAS" at `/mnt/nas/photos`, image at `/mnt/nas/photos/2024/vacat
 
 ## Acceptance Criteria
 
-- [ ] Thumbnails generated for JPEG, PNG, TIFF, WebP, HEIC source images
-- [ ] Thumbnails generated for camera RAW files (CR2, NEF, ARW, DNG)
-- [ ] Output format configurable (WebP, JPEG, AVIF)
-- [ ] Thumbnail size configurable
-- [ ] Thumbnails stored in correct work folder path mirroring source structure
-- [ ] Unchanged images skip thumbnail regeneration
-- [ ] Thumbnails served via API endpoint
-- [ ] Batch regeneration available when settings change
+- [x] Thumbnails generated for JPEG, PNG, TIFF, WebP, HEIC source images
+- [x] Thumbnails generated for camera RAW files (CR2, NEF, ARW, DNG)
+- [x] Output format configurable (WebP, JPEG, AVIF)
+- [x] Thumbnail size configurable
+- [x] Thumbnails stored in correct work folder path mirroring source structure
+- [x] Unchanged images skip thumbnail regeneration
+- [x] Thumbnails served via API endpoint
+- [x] Batch regeneration available when settings change
 
 ## Tasks
 
-- [ ] Implement thumbnail generation with sharp | backend
-- [ ] Handle camera RAW thumbnail extraction (embedded preview + fallback) | backend
-- [ ] Implement work folder path resolution mirroring source structure | backend
-- [ ] Add thumbnail settings to app configuration (format, size) | backend
-- [ ] Create thumbnail serving API endpoint | backend, api
-- [ ] Integrate thumbnail generation into scan pipeline | backend
-- [ ] Add regeneration endpoint for settings changes | backend, api
+- [x] Implement thumbnail generation with sharp | backend
+- [x] Handle camera RAW thumbnail extraction (embedded preview + fallback) | backend
+- [x] Implement work folder path resolution mirroring source structure | backend
+- [x] Add thumbnail settings to app configuration (format, size) | backend
+- [x] Create thumbnail serving API endpoint | backend, api
+- [x] Integrate thumbnail generation into scan pipeline | backend
+- [x] Add regeneration endpoint for settings changes | backend, api

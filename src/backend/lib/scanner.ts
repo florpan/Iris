@@ -12,6 +12,8 @@ import { db } from "../db/client";
 import { images, sourceFolders } from "../db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { extractMetadata } from "./metadata";
+import { generateThumbnail, loadThumbnailSettings } from "./thumbnailer";
+import { loadConfig } from "./config";
 
 // ── Supported formats ────────────────────────────────────────────────────────
 
@@ -177,6 +179,11 @@ async function scanSource(source: { id: number; path: string; name: string }): P
     return;
   }
 
+  // Load thumbnail settings once per source
+  const thumbSettings = await loadThumbnailSettings();
+  const config = loadConfig();
+  const workFolder = path.resolve(config.workFolder);
+
   // Discover all image files in the directory tree
   const absolutePaths = walkDirectory(source.path);
   currentScan.total += absolutePaths.length;
@@ -259,17 +266,47 @@ async function scanSource(source: { id: number; path: string; name: string }): P
         updatedAt: new Date(),
       };
 
+      let imageId: number;
       if (existing) {
         // Update existing record
-        await db
+        const [updated] = await db
           .update(images)
           .set(record)
-          .where(eq(images.id, existing.id));
+          .where(eq(images.id, existing.id))
+          .returning({ id: images.id });
+        imageId = updated?.id ?? existing.id;
         currentScan.updated++;
       } else {
         // Insert new record
-        await db.insert(images).values(record);
+        const [inserted] = await db
+          .insert(images)
+          .values(record)
+          .returning({ id: images.id });
+        imageId = inserted.id;
         currentScan.added++;
+      }
+
+      // ── Generate thumbnail ────────────────────────────────────────────────
+      try {
+        const thumbResult = await generateThumbnail({
+          sourcePath: absolutePath,
+          sourceName: source.name,
+          relativePath,
+          workFolder,
+          thumbSettings,
+          force: false, // incremental — skip existing thumbnails
+        });
+
+        if (!thumbResult.skipped) {
+          await db
+            .update(images)
+            .set({ thumbnailPath: thumbResult.relativePath, updatedAt: new Date() })
+            .where(eq(images.id, imageId));
+        }
+      } catch (thumbErr) {
+        // Thumbnail generation failure is non-fatal — log and continue
+        const thumbMsg = thumbErr instanceof Error ? thumbErr.message : String(thumbErr);
+        currentScan.errors.push(`Thumbnail failed for ${relativePath}: ${thumbMsg}`);
       }
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);

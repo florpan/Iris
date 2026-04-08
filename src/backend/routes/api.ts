@@ -8,6 +8,7 @@ import { foldersRouter } from "./folders";
 import { tagsRouter } from "./tags";
 import { syncRouter } from "./sync";
 import { statsRouter } from "./stats";
+import { thumbnailsRouter } from "./thumbnails";
 
 export const apiRouter = new Hono();
 
@@ -23,3 +24,4 @@ apiRouter.route("/folders", foldersRouter);
 apiRouter.route("/tags", tagsRouter);
 apiRouter.route("/sync", syncRouter);
 apiRouter.route("/stats", statsRouter);
+apiRouter.route("/thumbnails", thumbnailsRouter);
