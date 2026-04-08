@@ -1,7 +1,7 @@
 ---
 id: context-aware-return-navigation
 title: Context-aware return navigation
-status: in-progress
+status: complete
 milestone: browsing
 priority: medium
 depends_on: image-detail, search, metadata-filtering
