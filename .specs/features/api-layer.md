@@ -1,7 +1,7 @@
 ---
 id: api-layer
 title: Core API Layer — Routes, Image Serving, Shared Patterns
-status: in-progress
+status: complete
 milestone: foundation
 priority: high
 handoff: single
