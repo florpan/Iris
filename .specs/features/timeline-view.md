@@ -1,7 +1,7 @@
 ---
 id: timeline-view
 title: Timeline View — Chronological Image Display
-status: in-progress
+status: complete
 milestone: views
 priority: medium
 handoff: single
