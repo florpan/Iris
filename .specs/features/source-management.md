@@ -1,6 +1,6 @@
 ---
 id: source-management
-title: Source Folder & Work Folder Management
+title: Source Folder & Work Folder Configuration
 status: pending
 milestone: foundation
 priority: high
@@ -10,42 +10,56 @@ dependsOn: project-setup
 
 ## Overview
 
-Users configure one or more source folders where their images live and a single work folder where Iris stores thumbnails and other generated data. Source folders are strictly read-only. The work folder mirrors the source folder structure: `<workfolder>/<source-name>/<path-in-source>/`.
+Configure source folders (where images live) and a work folder (where Iris stores thumbnails and generated data). This is a setup-time configuration, not a runtime UI feature. Configuration lives in a settings file or environment variables, making it easy to set up in Docker via volume mounts and env vars.
 
 ## Key Design Decisions
 
-### Multiple Sources, One Work Folder
-Each source folder gets a user-assigned name (e.g., "NAS Photos", "Camera SD"). The work folder organizes by source name to avoid path collisions: `work/nas-photos/2024/vacation/thumb.webp`.
+### Configuration, Not UI
+Source and work folders are configured once at setup time. No settings page needed — this is infrastructure config, like a database URL. A `config.yaml` or environment variables handle it.
 
-### Source Types
-Initially: local filesystem paths and network shares (SMB/NFS mounted as local paths). Architecture should allow adding cloud sources (Google Drive, OneDrive) later without restructuring.
+### Docker-First
+In a typical Docker deployment, source folders are mounted as read-only volumes and the work folder as a read-write volume. Config maps directly:
+
+```yaml
+# config.yaml
+sources:
+  - name: photos
+    path: /data/photos
+  - name: camera
+    path: /data/camera
+workFolder: /data/work
+```
+
+Or via environment: `IRIS_SOURCES=photos:/data/photos,camera:/data/camera` and `IRIS_WORK_FOLDER=/data/work`.
 
 ### Read-Only Sources
-Iris must never write, modify, or delete anything in source folders. All generated data goes to the work folder.
+Source folders are strictly read-only. Iris never writes to them.
+
+### Work Folder Structure
+Work folder mirrors source structure: `<work>/<source-name>/<relative-path>/`. This avoids path collisions when multiple sources have identical subfolder names.
 
 ## Requirements
 
-- Settings page to add/remove/edit source folders
-- Settings page to configure work folder path
-- Source folder validation (exists, readable, is a directory)
-- Work folder validation (exists, writable)
-- Database storage for source configurations
-- API endpoints for CRUD on sources and work folder config
+- Configuration via YAML file and/or environment variables
+- One or more named source folders
+- One work folder
+- Startup validation: sources exist and are readable, work folder exists and is writable
+- Work folder subdirectories created per source name on startup
+- Graceful error on missing/unreadable source (log warning, skip, don't crash)
 
 ## Acceptance Criteria
 
-- [ ] User can add a source folder with a name and path
-- [ ] User can set the work folder path
-- [ ] Source folder is validated as existing and readable
-- [ ] Work folder is validated as writable
-- [ ] Multiple source folders can be configured
-- [ ] Source configurations persist in database
+- [ ] Source folders configurable via config file
+- [ ] Source folders configurable via environment variables
+- [ ] Work folder configurable via config file and environment
+- [ ] Startup validates source folders are readable
+- [ ] Startup validates work folder is writable
 - [ ] Work folder structure created as `<work>/<source-name>/`
+- [ ] Missing source folder logs warning but doesn't crash (network share may be temporarily unavailable)
 
 ## Tasks
 
-- [ ] Create database schema for source folders and app settings | backend, database
-- [ ] Create API endpoints for source CRUD and work folder config | backend, api
-- [ ] Build settings page with source folder management UI | frontend
-- [ ] Implement path validation (readable source, writable work folder) | backend
-- [ ] Create work folder directory structure mirroring sources | backend
+- [ ] Create config schema and loader (YAML file + env var fallback) | backend
+- [ ] Implement startup validation for source and work folders | backend
+- [ ] Create work folder directory structure on startup | backend
+- [ ] Create API endpoint to read current config (for UI status display) | backend, api
