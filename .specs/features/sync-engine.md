@@ -1,7 +1,7 @@
 ---
 id: sync-engine
 title: Sync Engine — Source Monitoring & Incremental Updates
-status: in-progress
+status: complete
 milestone: foundation
 priority: medium
 handoff: single
