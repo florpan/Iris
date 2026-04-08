@@ -1,7 +1,7 @@
 ---
 id: project-setup
 title: Project Setup & Configuration
-status: in-progress
+status: complete
 milestone: foundation
 priority: high
 handoff: single
