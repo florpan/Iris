@@ -23,7 +23,7 @@ const STORAGE_KEY_SIDEBAR_COLLAPSED = "iris-sidebar-collapsed";
 function readViewMode(): ViewMode {
   try {
     const stored = localStorage.getItem(STORAGE_KEY_VIEW_MODE);
-    if (stored === "grid" || stored === "list" || stored === "timeline") return stored;
+    if (stored === "grid" || stored === "list" || stored === "timeline" || stored === "map") return stored;
   } catch {
     // ignore
   }

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gte, isNotNull, lte, sql, ilike, like, type SQL } from "drizzle-orm";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { db } from "../db/client";
@@ -8,6 +8,157 @@ import { images, sourceFolders } from "../db/schema";
 import { parsePagination, paginatedResponse } from "../lib/pagination";
 
 export const imagesRouter = new Hono();
+
+// ── GPS endpoint ──────────────────────────────────────────────────────────────
+
+/**
+ * GET /api/images/gps — return all GPS-tagged images matching optional filters.
+ *
+ * This endpoint is used by the map view to plot images on a Leaflet map.
+ * It returns up to GPS_LIMIT images (no pagination — all needed for markers).
+ *
+ * Also returns:
+ *   - `total`: total images matching the filter (with or without GPS)
+ *   - `gpsCount`: images matching the filter that have GPS data
+ *
+ * Filter params:
+ *   sourceId   — restrict to a single source folder (integer)
+ *   folderPath — restrict to a specific folder within the source (requires sourceId)
+ *   q          — full-text search query (filename, IPTC fields)
+ *   camera     — camera model filter (partial, case-insensitive)
+ *   lens       — lens model filter (partial, case-insensitive)
+ *   dateFrom   — ISO date filter: takenAt >= dateFrom
+ *   dateTo     — ISO date filter: takenAt <= dateTo
+ *   format     — MIME type filter (exact)
+ *   minSize    — minimum file size in bytes
+ *   maxSize    — maximum file size in bytes
+ */
+
+const GPS_LIMIT = 5000;
+
+imagesRouter.get("/gps", async (c) => {
+  const sourceId = c.req.query("sourceId") ? Number(c.req.query("sourceId")) : null;
+  const folderPath = c.req.query("folderPath") ?? null;
+  const q = c.req.query("q") ?? "";
+  const camera = c.req.query("camera") ?? "";
+  const lens = c.req.query("lens") ?? "";
+  const dateFrom = c.req.query("dateFrom") ?? "";
+  const dateTo = c.req.query("dateTo") ?? "";
+  const format = c.req.query("format") ?? "";
+  const minSize = c.req.query("minSize") ? Number(c.req.query("minSize")) : null;
+  const maxSize = c.req.query("maxSize") ? Number(c.req.query("maxSize")) : null;
+
+  // Build shared filter conditions (no GPS requirement — used for total count)
+  const baseConditions: SQL[] = [];
+
+  if (sourceId !== null && Number.isFinite(sourceId)) {
+    baseConditions.push(eq(images.sourceFolderId, sourceId));
+
+    if (folderPath !== null) {
+      if (folderPath === "") {
+        // Root of the source: files not in any subdirectory
+        baseConditions.push(
+          sql`${images.relativePath} NOT LIKE '%/%'`
+        );
+      } else {
+        // Only direct children of folderPath
+        baseConditions.push(
+          like(images.relativePath, `${folderPath}/%`)
+        );
+        baseConditions.push(
+          sql`${images.relativePath} NOT LIKE ${folderPath + "/%/%"}`
+        );
+      }
+    }
+  }
+
+  if (camera) {
+    baseConditions.push(ilike(images.cameraModel, `%${camera}%`));
+  }
+  if (lens) {
+    baseConditions.push(ilike(images.lensModel, `%${lens}%`));
+  }
+  if (dateFrom) {
+    baseConditions.push(gte(images.takenAt, new Date(dateFrom)));
+  }
+  if (dateTo) {
+    baseConditions.push(lte(images.takenAt, new Date(dateTo)));
+  }
+  if (format) {
+    baseConditions.push(eq(images.mimeType, format));
+  }
+  if (minSize !== null && Number.isFinite(minSize)) {
+    baseConditions.push(gte(images.fileSize, minSize));
+  }
+  if (maxSize !== null && Number.isFinite(maxSize)) {
+    baseConditions.push(lte(images.fileSize, maxSize));
+  }
+
+  // Full-text search filter (simple ilike on fileName + iptcTitle)
+  if (q) {
+    const searchVector = sql<string>`(
+      setweight(to_tsvector('simple', coalesce(${images.fileName}, '')), 'B') ||
+      setweight(to_tsvector('simple', coalesce(${images.iptcTitle}, '')), 'A') ||
+      setweight(to_tsvector('simple', coalesce(${images.iptcDescription}, '')), 'B') ||
+      setweight(to_tsvector('simple', coalesce(
+        (SELECT string_agg(kw, ' ') FROM jsonb_array_elements_text(${images.iptcKeywords}) AS kw),
+        ''
+      )), 'B')
+    )`;
+    const tsQuery = q
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((w) => w.replace(/[^a-zA-Z0-9_]/g, "") + ":*")
+      .join(" & ");
+    if (tsQuery) {
+      baseConditions.push(sql`${searchVector} @@ to_tsquery('simple', ${tsQuery})`);
+    }
+  }
+
+  const gpsConditions = [
+    ...baseConditions,
+    isNotNull(images.latitude),
+    isNotNull(images.longitude),
+  ];
+
+  const whereBase = baseConditions.length > 0 ? and(...baseConditions) : undefined;
+  const whereGps = and(...gpsConditions);
+
+  const [totalResult, gpsCountResult, rows] = await Promise.all([
+    db
+      .select({ count: sql<number>`cast(count(*) as integer)` })
+      .from(images)
+      .where(whereBase),
+    db
+      .select({ count: sql<number>`cast(count(*) as integer)` })
+      .from(images)
+      .where(whereGps),
+    db
+      .select({
+        id: images.id,
+        fileName: images.fileName,
+        thumbnailPath: images.thumbnailPath,
+        latitude: images.latitude,
+        longitude: images.longitude,
+      })
+      .from(images)
+      .where(whereGps)
+      .orderBy(images.takenAt)
+      .limit(GPS_LIMIT),
+  ]);
+
+  const total = totalResult[0]?.count ?? 0;
+  const gpsCount = gpsCountResult[0]?.count ?? 0;
+
+  return c.json({
+    data: rows,
+    total,
+    gpsCount,
+    limit: GPS_LIMIT,
+    truncated: gpsCount > GPS_LIMIT,
+  });
+});
 
 // RAW file extensions that need preview extraction / conversion
 const RAW_EXTENSIONS = new Set([

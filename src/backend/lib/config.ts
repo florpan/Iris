@@ -13,11 +13,15 @@
  *   - name: camera
  *     path: /data/camera
  * workFolder: /data/work
+ * mapTileUrl: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+ * mapTileAttribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
  * ```
  *
  * Env-var format:
  *   IRIS_SOURCES=photos:/data/photos,camera:/data/camera
  *   IRIS_WORK_FOLDER=/data/work
+ *   IRIS_MAP_TILE_URL=https://tiles.example.com/{z}/{x}/{y}.png
+ *   IRIS_MAP_TILE_ATTRIBUTION=&copy; Example Maps
  */
 
 import * as fs from "node:fs";
@@ -31,6 +35,10 @@ export interface SourceConfig {
 export interface AppConfig {
   sources: SourceConfig[];
   workFolder: string;
+  /** Leaflet tile URL template. Defaults to OpenStreetMap. */
+  mapTileUrl?: string;
+  /** Leaflet tile attribution HTML. */
+  mapTileAttribution?: string;
 }
 
 // ── Defaults ─────────────────────────────────────────────────────────────────
@@ -80,6 +88,19 @@ function parseConfigYaml(content: string): Partial<AppConfig> {
       const workMatch = trimmed.match(/^workFolder:\s*(.+)$/);
       if (workMatch) {
         result.workFolder = workMatch[1].trim();
+        continue;
+      }
+
+      const mapTileUrlMatch = trimmed.match(/^mapTileUrl:\s*(.+)$/);
+      if (mapTileUrlMatch) {
+        // Strip surrounding quotes if present
+        result.mapTileUrl = mapTileUrlMatch[1].trim().replace(/^['"]|['"]$/g, "");
+        continue;
+      }
+
+      const mapTileAttrMatch = trimmed.match(/^mapTileAttribution:\s*(.+)$/);
+      if (mapTileAttrMatch) {
+        result.mapTileAttribution = mapTileAttrMatch[1].trim().replace(/^['"]|['"]$/g, "");
         continue;
       }
 
@@ -202,6 +223,16 @@ function loadEnvConfig(): Partial<AppConfig> {
     result.workFolder = workFolder;
   }
 
+  const mapTileUrl = process.env.IRIS_MAP_TILE_URL;
+  if (mapTileUrl) {
+    result.mapTileUrl = mapTileUrl;
+  }
+
+  const mapTileAttribution = process.env.IRIS_MAP_TILE_ATTRIBUTION;
+  if (mapTileAttribution) {
+    result.mapTileAttribution = mapTileAttribution;
+  }
+
   return result;
 }
 
@@ -225,8 +256,15 @@ export function loadConfig(force = false): AppConfig {
   const sources = envConfig.sources ?? fileConfig.sources ?? [];
   const workFolder =
     envConfig.workFolder ?? fileConfig.workFolder ?? DEFAULT_WORK_FOLDER;
+  const mapTileUrl = envConfig.mapTileUrl ?? fileConfig.mapTileUrl;
+  const mapTileAttribution = envConfig.mapTileAttribution ?? fileConfig.mapTileAttribution;
 
-  _cachedConfig = { sources, workFolder };
+  _cachedConfig = {
+    sources,
+    workFolder,
+    ...(mapTileUrl ? { mapTileUrl } : {}),
+    ...(mapTileAttribution ? { mapTileAttribution } : {}),
+  };
 
   if (sources.length === 0) {
     console.warn(

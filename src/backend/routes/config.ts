@@ -51,6 +51,10 @@ configRouter.get("/", (c) => {
       workFolderAvailable,
       ...(workFolderError ? { workFolderError } : {}),
       sources,
+      map: {
+        tileUrl: config.mapTileUrl ?? null,
+        tileAttribution: config.mapTileAttribution ?? null,
+      },
       app: {
         name: "Iris",
         version: "0.1.0",

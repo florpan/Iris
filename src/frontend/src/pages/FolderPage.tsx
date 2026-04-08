@@ -17,7 +17,10 @@ import { cn } from "@/lib/utils";
 import { FolderTree, type SelectedFolder } from "@/components/FolderTree";
 import { FolderBreadcrumb } from "@/components/FolderBreadcrumb";
 import { ImageGrid, type GridDensity } from "@/components/ImageGrid";
+import { MapView } from "@/components/MapView";
 import { popFolderRestoreState } from "@/hooks/useNavigationContext";
+import { useAppState } from "@/hooks/useAppState";
+import { useMapConfig } from "@/hooks/useMapConfig";
 
 export function FolderPage() {
   const [selected, setSelected] = useState<SelectedFolder | null>(null);
@@ -25,6 +28,8 @@ export function FolderPage() {
   const [treeOpen, setTreeOpen] = useState(true);
   // Pending folder restore from sessionStorage (set when navigating back from image detail)
   const [pendingRestore, setPendingRestore] = useState(() => popFolderRestoreState());
+  const { viewMode } = useAppState();
+  const mapConfig = useMapConfig();
 
   // Apply pending folder restore on mount (navigating back from image detail)
   useEffect(() => {
@@ -91,13 +96,22 @@ export function FolderPage() {
           />
         </div>
 
-        {/* Image grid */}
+        {/* Image grid or Map view */}
         <div className="flex-1 min-h-0 overflow-hidden">
-          <ImageGrid
-            selected={selected}
-            density={density}
-            onDensityChange={setDensity}
-          />
+          {viewMode === "map" ? (
+            <MapView
+              sourceId={selected?.sourceId ?? null}
+              folderPath={selected?.path ?? null}
+              tileUrl={mapConfig.tileUrl}
+              tileAttribution={mapConfig.tileAttribution}
+            />
+          ) : (
+            <ImageGrid
+              selected={selected}
+              density={density}
+              onDensityChange={setDensity}
+            />
+          )}
         </div>
       </div>
     </div>

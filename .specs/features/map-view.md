@@ -1,7 +1,7 @@
 ---
 id: map-view
 title: Map View — GPS-Based Image Display
-status: ready
+status: in-progress
 milestone: views
 priority: medium
 handoff: single
@@ -37,21 +37,21 @@ Images without GPS data simply don't appear on the map. Show a count: "Showing 2
 
 ## Acceptance Criteria
 
-- [ ] Map displays markers for GPS-tagged images
-- [ ] Clustering groups nearby markers at low zoom
-- [ ] Clicking marker shows thumbnail popup
-- [ ] Popup links to image detail view
-- [ ] Map works with folder, search, and filter results
-- [ ] Map auto-fits to show all markers
-- [ ] GPS count indicator shown
-- [ ] Tile source configurable
+- [x] Map displays markers for GPS-tagged images
+- [x] Clustering groups nearby markers at low zoom
+- [x] Clicking marker shows thumbnail popup
+- [x] Popup links to image detail view
+- [x] Map works with folder, search, and filter results
+- [x] Map auto-fits to show all markers
+- [x] GPS count indicator shown
+- [x] Tile source configurable
 
 ## Tasks
 
-- [ ] Create API endpoint for images with GPS data (paginated, with coordinates) | backend, api
-- [ ] Integrate Leaflet with React | frontend
-- [ ] Implement marker clustering | frontend
-- [ ] Build thumbnail popup component for markers | frontend
-- [ ] Add map view toggle to folder/search/filter views | frontend
-- [ ] Implement auto-fit bounds | frontend
-- [ ] Add tile source configuration to settings | frontend, backend
+- [x] Create API endpoint for images with GPS data (paginated, with coordinates) | backend, api
+- [x] Integrate Leaflet with React | frontend
+- [x] Implement marker clustering | frontend
+- [x] Build thumbnail popup component for markers | frontend
+- [x] Add map view toggle to folder/search/filter views | frontend
+- [x] Implement auto-fit bounds | frontend
+- [x] Add tile source configuration to settings | frontend, backend

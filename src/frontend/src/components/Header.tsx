@@ -10,11 +10,11 @@
  * The header is rendered at the top of the AppShell above the sidebar+content area.
  */
 
-import { LayoutGrid, AlignJustify, Calendar, Menu, Aperture } from "lucide-react";
+import { LayoutGrid, AlignJustify, Calendar, Map, Menu, Aperture } from "lucide-react";
 import { TopSearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
 
-export type ViewMode = "grid" | "list" | "timeline";
+export type ViewMode = "grid" | "list" | "timeline" | "map";
 
 interface ViewModeButtonProps {
   mode: ViewMode;
@@ -123,6 +123,13 @@ export function Header({
           current={viewMode}
           icon={Calendar}
           label="Timeline"
+          onClick={onViewModeChange}
+        />
+        <ViewModeButton
+          mode="map"
+          current={viewMode}
+          icon={Map}
+          label="Map"
           onClick={onViewModeChange}
         />
       </div>

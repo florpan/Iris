@@ -26,6 +26,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { SearchFilterPanel, type SearchFilters } from "@/components/SearchFilters";
 import { ImageDetailModal } from "@/components/ImageDetailModal";
 import { EmptyState } from "@/components/EmptyState";
+import { MapView } from "@/components/MapView";
 import type { GridDensity } from "@/components/ImageGrid";
 import {
   buildImageDetailUrl,
@@ -33,6 +34,8 @@ import {
   getScrollPosition,
   type ReturnContext,
 } from "@/hooks/useNavigationContext";
+import { useAppState } from "@/hooks/useAppState";
+import { useMapConfig } from "@/hooks/useMapConfig";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -228,6 +231,8 @@ const SORT_OPTIONS: Array<{ value: SortField; label: string }> = [
 
 export function SearchPage() {
   const initialState = parseUrlState();
+  const { viewMode } = useAppState();
+  const mapConfig = useMapConfig();
 
   const [query, setQuery] = useState(initialState.q);
   const [submittedQuery, setSubmittedQuery] = useState(initialState.q);
@@ -561,7 +566,33 @@ export function SearchPage() {
       )}
 
       {/* ── Content area ────────────────────────────────────────────────────── */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+      {/* Map view — shown when viewMode is "map" and a search has been done */}
+      {viewMode === "map" && hasSearched && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <MapView
+            searchQuery={submittedQuery}
+            camera={filters.camera}
+            lens={filters.lens}
+            dateFrom={filters.dateFrom}
+            dateTo={filters.dateTo}
+            format={filters.format}
+            minSize={filters.minSize}
+            maxSize={filters.maxSize}
+            tileUrl={mapConfig.tileUrl}
+            tileAttribution={mapConfig.tileAttribution}
+          />
+        </div>
+      )}
+      {viewMode === "map" && !hasSearched && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <MapView
+            tileUrl={mapConfig.tileUrl}
+            tileAttribution={mapConfig.tileAttribution}
+          />
+        </div>
+      )}
+
+      <div ref={scrollContainerRef} className={cn("flex-1 overflow-y-auto", viewMode === "map" && "hidden")}>
         {!hasSearched ? (
           <EmptyState.SearchPrompt />
         ) : error ? (
@@ -604,7 +635,7 @@ export function SearchPage() {
       </div>
 
       {/* ── Pagination ───────────────────────────────────────────────────────── */}
-      {pagination && pagination.totalPages > 1 && (
+      {viewMode !== "map" && pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-2.5 border-t border-[var(--color-border)] text-sm shrink-0">
           <span className="text-[var(--color-text-muted)]">
             Page {pagination.page} of {pagination.totalPages}
