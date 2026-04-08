@@ -3,6 +3,7 @@ import { serveStatic } from "hono/bun";
 import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 import { apiRouter } from "./routes/api";
+import { runStartup } from "./lib/startup";
 
 const app = new Hono();
 
@@ -27,6 +28,16 @@ app.use("/*", serveStatic({ root: publicDir }));
 app.get("*", serveStatic({ path: `${publicDir}/index.html` }));
 
 const port = Number(process.env.PORT ?? 3000);
+
+// Run startup validation and folder setup before serving requests
+runStartup().then((result) => {
+  if (result.fatalError) {
+    console.error(`[startup] Fatal error — server may not function correctly: ${result.fatalError}`);
+  }
+  if (result.warnings.length > 0) {
+    console.warn(`[startup] ${result.warnings.length} warning(s) during startup`);
+  }
+});
 
 console.log(`🌸 Iris server running on http://localhost:${port}`);
 

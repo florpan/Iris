@@ -1,7 +1,7 @@
 ---
 id: source-management
 title: Source Folder & Work Folder Configuration
-status: ready
+status: in-progress
 milestone: foundation
 priority: high
 handoff: single
@@ -50,17 +50,17 @@ Work folder mirrors source structure: `<work>/<source-name>/<relative-path>/`. T
 
 ## Acceptance Criteria
 
-- [ ] Source folders configurable via config file
-- [ ] Source folders configurable via environment variables
-- [ ] Work folder configurable via config file and environment
-- [ ] Startup validates source folders are readable
-- [ ] Startup validates work folder is writable
-- [ ] Work folder structure created as `<work>/<source-name>/`
-- [ ] Missing source folder logs warning but doesn't crash (network share may be temporarily unavailable)
+- [x] Source folders configurable via config file
+- [x] Source folders configurable via environment variables
+- [x] Work folder configurable via config file and environment
+- [x] Startup validates source folders are readable
+- [x] Startup validates work folder is writable
+- [x] Work folder structure created as `<work>/<source-name>/`
+- [x] Missing source folder logs warning but doesn't crash (network share may be temporarily unavailable)
 
 ## Tasks
 
-- [ ] Create config schema and loader (YAML file + env var fallback) | backend
-- [ ] Implement startup validation for source and work folders | backend
-- [ ] Create work folder directory structure on startup | backend
-- [ ] Create API endpoint to read current config (for UI status display) | backend, api
+- [x] Create config schema and loader (YAML file + env var fallback) | backend
+- [x] Implement startup validation for source and work folders | backend
+- [x] Create work folder directory structure on startup | backend
+- [x] Create API endpoint to read current config (for UI status display) | backend, api
