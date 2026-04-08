@@ -24,6 +24,13 @@ import {
 import { cn } from "@/lib/utils";
 import type { SelectedFolder } from "./FolderTree";
 import { ImageDetailModal } from "./ImageDetailModal";
+import {
+  buildImageDetailUrl,
+  saveScrollPosition,
+  getScrollPosition,
+  saveFolderState,
+  type ReturnContext,
+} from "@/hooks/useNavigationContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -196,6 +203,10 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
 
   // Detail view state
   const [detailImageId, setDetailImageId] = useState<number | null>(null);
+  const [detailContext, setDetailContext] = useState<ReturnContext | null>(null);
+
+  // Ref for scroll position saving/restoring
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Reset page when folder or sort changes
   useEffect(() => {
@@ -237,6 +248,78 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
       .finally(() => setLoading(false));
   }, [selected, page, sort, order]);
 
+  // Open image detail with context tracking
+  const openDetail = useCallback(
+    (imageId: number) => {
+      if (!selected) return;
+
+      const scrollTop = scrollContainerRef.current?.scrollTop ?? 0;
+      const contextParams = new URLSearchParams({
+        sourceId: String(selected.sourceId),
+        folderPath: selected.path,
+        sort,
+        order,
+        page: String(page),
+      });
+      const detailUrl = buildImageDetailUrl(imageId, "folder", contextParams);
+      const returnUrl = "/folders";
+
+      // Save folder state so FolderPage can restore it on return
+      saveFolderState({
+        sourceId: selected.sourceId,
+        path: selected.path,
+        sourceName: selected.sourceName,
+        sort,
+        order,
+        page,
+      });
+
+      // Save scroll position keyed by return URL
+      saveScrollPosition(returnUrl, scrollTop);
+
+      // Push URL entry so browser back button works
+      window.history.pushState({ imageId, from: "folder" }, "", detailUrl);
+
+      const folderName = selected.path.split("/").filter(Boolean).pop() ?? "folder";
+      setDetailContext({
+        type: "folder",
+        label: `Back to ${folderName}`,
+        returnUrl,
+      });
+      setDetailImageId(imageId);
+    },
+    [selected, sort, order, page]
+  );
+
+  // Close detail and restore context on browser back navigation
+  useEffect(() => {
+    const handlePopstate = () => {
+      const path = window.location.pathname;
+      if (!path.startsWith("/image/") && detailImageId !== null) {
+        setDetailImageId(null);
+        setDetailContext(null);
+        // Restore scroll position
+        const scrollTop = getScrollPosition("/folders");
+        if (scrollTop !== null && scrollContainerRef.current) {
+          // Defer to after render
+          setTimeout(() => {
+            if (scrollContainerRef.current) {
+              scrollContainerRef.current.scrollTop = scrollTop;
+            }
+          }, 0);
+        }
+      }
+    };
+    window.addEventListener("popstate", handlePopstate);
+    return () => window.removeEventListener("popstate", handlePopstate);
+  }, [detailImageId]);
+
+  // Handle back navigation from modal: pop history entry and restore scroll
+  const handleDetailBack = useCallback(() => {
+    window.history.back();
+    // popstate handler will close the modal and restore scroll
+  }, []);
+
   const handleSortField = (field: SortField) => {
     if (field === sort) {
       // Toggle order
@@ -264,7 +347,7 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
       else if (e.key === "ArrowUp") next = Math.max(index - cols, 0);
       else if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        setDetailImageId(images[index].id);
+        openDetail(images[index].id);
         return;
       }
 
@@ -273,7 +356,7 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
         setFocusedIndex(next);
       }
     },
-    [density, images]
+    [density, images, openDetail]
   );
 
   // ── Empty state ──────────────────────────────────────────────────────────────
@@ -362,7 +445,7 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
       </div>
 
       {/* ── Content area ────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
         {error ? (
           <div className="flex items-center gap-2 p-6 text-sm text-red-500">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -395,7 +478,7 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
                     isFocused={focusedIndex === i}
                     onFocus={() => setFocusedIndex(i)}
                     onKeyDown={(e) => handleKeyDown(e, i)}
-                    onClick={() => setDetailImageId(image.id)}
+                    onClick={() => openDetail(image.id)}
                   />
                 ))}
           </div>
@@ -491,8 +574,17 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
         <ImageDetailModal
           imageId={detailImageId}
           imageIds={images.map((img) => img.id)}
+          returnContext={detailContext}
           onNavigate={(id) => setDetailImageId(id)}
-          onClose={() => setDetailImageId(null)}
+          onClose={() => {
+            setDetailImageId(null);
+            setDetailContext(null);
+            // If we pushed a history entry, pop it
+            if (window.location.pathname.startsWith("/image/")) {
+              window.history.back();
+            }
+          }}
+          onBack={handleDetailBack}
         />
       )}
     </div>

@@ -24,7 +24,14 @@ import {
 import { cn } from "@/lib/utils";
 import { SearchBar } from "@/components/SearchBar";
 import { SearchFilterPanel, type SearchFilters } from "@/components/SearchFilters";
+import { ImageDetailModal } from "@/components/ImageDetailModal";
 import type { GridDensity } from "@/components/ImageGrid";
+import {
+  buildImageDetailUrl,
+  saveScrollPosition,
+  getScrollPosition,
+  type ReturnContext,
+} from "@/hooks/useNavigationContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -140,10 +147,11 @@ interface ThumbnailProps {
   isFocused: boolean;
   onFocus: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
+  onClick: () => void;
   query: string;
 }
 
-function Thumbnail({ image, density, isFocused, onFocus, onKeyDown }: ThumbnailProps) {
+function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: ThumbnailProps) {
   const [imgError, setImgError] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -166,6 +174,7 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown }: ThumbnailP
       )}
       onFocus={onFocus}
       onKeyDown={onKeyDown}
+      onClick={onClick}
     >
       {image.thumbnailPath && !imgError ? (
         <img
@@ -242,6 +251,12 @@ export function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
+  // Detail modal state
+  const [detailImageId, setDetailImageId] = useState<number | null>(null);
+  const [detailContext, setDetailContext] = useState<ReturnContext | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   const [hasSearched, setHasSearched] = useState(
     !!(initialState.q || initialState.camera || initialState.lens ||
       initialState.dateFrom || initialState.dateTo || initialState.format)
@@ -355,6 +370,44 @@ export function SearchPage() {
     [submittedQuery, filters, sort, order, doSearch]
   );
 
+  // Open image detail with context tracking
+  const openDetail = useCallback(
+    (imageId: number) => {
+      const returnUrl = `/search${window.location.search}`;
+      const scrollTop = scrollContainerRef.current?.scrollTop ?? 0;
+
+      // Build context params from current search state
+      const contextParams = new URLSearchParams();
+      if (submittedQuery) contextParams.set("q", submittedQuery);
+      if (filters.camera) contextParams.set("camera", filters.camera);
+      if (filters.lens) contextParams.set("lens", filters.lens);
+      if (filters.dateFrom) contextParams.set("dateFrom", filters.dateFrom);
+      if (filters.dateTo) contextParams.set("dateTo", filters.dateTo);
+      if (filters.format) contextParams.set("format", filters.format);
+      if (filters.minSize) contextParams.set("minSize", filters.minSize);
+      if (filters.maxSize) contextParams.set("maxSize", filters.maxSize);
+      if (sort) contextParams.set("sort", sort);
+      if (order !== "desc") contextParams.set("order", order);
+      if (page > 1) contextParams.set("page", String(page));
+
+      const detailUrl = buildImageDetailUrl(imageId, "search", contextParams);
+
+      // Save scroll position for restoration
+      saveScrollPosition(returnUrl, scrollTop);
+
+      // Push URL entry for browser back button support
+      window.history.pushState({ imageId, from: "search" }, "", detailUrl);
+
+      const label = submittedQuery
+        ? `Back to search: "${submittedQuery}"`
+        : "Back to search results";
+
+      setDetailContext({ type: "search", label, returnUrl });
+      setDetailImageId(imageId);
+    },
+    [submittedQuery, filters, sort, order, page]
+  );
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, index: number) => {
       const cols = { small: 6, medium: 4, large: 3 }[density];
@@ -363,13 +416,45 @@ export function SearchPage() {
       else if (e.key === "ArrowLeft") next = Math.max(index - 1, 0);
       else if (e.key === "ArrowDown") next = Math.min(index + cols, images.length - 1);
       else if (e.key === "ArrowUp") next = Math.max(index - cols, 0);
+      else if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openDetail(images[index].id);
+        return;
+      }
       if (next !== null) {
         e.preventDefault();
         setFocusedIndex(next);
       }
     },
-    [density, images.length]
+    [density, images, openDetail]
   );
+
+  // Close modal when browser back is pressed
+  useEffect(() => {
+    const handlePopstate = () => {
+      const path = window.location.pathname;
+      if (!path.startsWith("/image/") && detailImageId !== null) {
+        setDetailImageId(null);
+        setDetailContext(null);
+        // Restore scroll position
+        const returnUrl = window.location.pathname + window.location.search;
+        const scrollTop = getScrollPosition(returnUrl);
+        if (scrollTop !== null && scrollContainerRef.current) {
+          setTimeout(() => {
+            if (scrollContainerRef.current) {
+              scrollContainerRef.current.scrollTop = scrollTop;
+            }
+          }, 0);
+        }
+      }
+    };
+    window.addEventListener("popstate", handlePopstate);
+    return () => window.removeEventListener("popstate", handlePopstate);
+  }, [detailImageId]);
+
+  const handleDetailBack = useCallback(() => {
+    window.history.back();
+  }, []);
 
   const totalImages = pagination?.total ?? 0;
 
@@ -475,7 +560,7 @@ export function SearchPage() {
       )}
 
       {/* ── Content area ────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
         {!hasSearched ? (
           // Empty state — no search yet
           <div className="flex flex-col items-center justify-center h-64 text-[var(--color-text-muted)]">
@@ -519,6 +604,7 @@ export function SearchPage() {
                     isFocused={focusedIndex === i}
                     onFocus={() => setFocusedIndex(i)}
                     onKeyDown={(e) => handleKeyDown(e, i)}
+                    onClick={() => openDetail(image.id)}
                     query={submittedQuery}
                   />
                 ))}
@@ -598,6 +684,24 @@ export function SearchPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── Image detail modal ──────────────────────────────────────────────── */}
+      {detailImageId !== null && (
+        <ImageDetailModal
+          imageId={detailImageId}
+          imageIds={images.map((img) => img.id)}
+          returnContext={detailContext}
+          onNavigate={(id) => setDetailImageId(id)}
+          onClose={() => {
+            setDetailImageId(null);
+            setDetailContext(null);
+            if (window.location.pathname.startsWith("/image/")) {
+              window.history.back();
+            }
+          }}
+          onBack={handleDetailBack}
+        />
       )}
     </div>
   );

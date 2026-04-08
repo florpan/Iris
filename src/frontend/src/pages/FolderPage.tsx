@@ -11,17 +11,32 @@
  *  - Mobile:  collapsible tree (toggleable via hamburger)
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FolderOpen, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FolderTree, type SelectedFolder } from "@/components/FolderTree";
 import { FolderBreadcrumb } from "@/components/FolderBreadcrumb";
 import { ImageGrid, type GridDensity } from "@/components/ImageGrid";
+import { popFolderRestoreState } from "@/hooks/useNavigationContext";
 
 export function FolderPage() {
   const [selected, setSelected] = useState<SelectedFolder | null>(null);
   const [density, setDensity] = useState<GridDensity>("medium");
   const [treeOpen, setTreeOpen] = useState(true);
+  // Pending folder restore from sessionStorage (set when navigating back from image detail)
+  const [pendingRestore, setPendingRestore] = useState(() => popFolderRestoreState());
+
+  // Apply pending folder restore on mount (navigating back from image detail)
+  useEffect(() => {
+    if (pendingRestore) {
+      setSelected({
+        sourceId: pendingRestore.sourceId,
+        path: pendingRestore.path,
+        sourceName: pendingRestore.sourceName,
+      });
+      setPendingRestore(null);
+    }
+  }, [pendingRestore]);
 
   return (
     <div className="flex h-full overflow-hidden">

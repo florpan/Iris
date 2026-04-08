@@ -34,17 +34,23 @@ import {
   Maximize,
   Loader2,
   AlertCircle,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MetadataPanel, type ImageDetail } from "./MetadataPanel";
+import type { ReturnContext } from "@/hooks/useNavigationContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface ImageDetailModalProps {
   imageId: number;
   imageIds: number[];
+  /** Optional context for the back button (where the user came from) */
+  returnContext?: ReturnContext | null;
   onNavigate: (id: number) => void;
   onClose: () => void;
+  /** Called when the back button is clicked; uses onClose if not provided */
+  onBack?: () => void;
 }
 
 // ── Image Viewer (zoom/pan) ───────────────────────────────────────────────────
@@ -257,8 +263,10 @@ function ImageViewer({ src, alt }: ImageViewerProps) {
 export function ImageDetailModal({
   imageId,
   imageIds,
+  returnContext,
   onNavigate,
   onClose,
+  onBack,
 }: ImageDetailModalProps) {
   const [detail, setDetail] = useState<ImageDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -344,6 +352,24 @@ export function ImageDetailModal({
       >
         {/* ── Image area ──────────────────────────────────────────────── */}
         <div className="relative flex-1 flex flex-col overflow-hidden">
+          {/* Back button (shown when context is available) */}
+          {returnContext && (
+            <button
+              onClick={onBack ?? onClose}
+              className={cn(
+                "absolute top-3 left-3 z-10 flex items-center gap-1.5",
+                "px-3 py-1.5 rounded-full bg-black/50 text-white text-xs font-medium",
+                "hover:bg-black/70 transition-colors max-w-[200px]",
+                "focus:outline-none focus:ring-2 focus:ring-white/50"
+              )}
+              aria-label={returnContext.label}
+              title={returnContext.label}
+            >
+              <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{returnContext.label}</span>
+            </button>
+          )}
+
           {/* Close button */}
           <button
             onClick={onClose}
