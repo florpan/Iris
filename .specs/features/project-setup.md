@@ -10,6 +10,7 @@ handoff: single
 ## Overview
 
 Initialize the Iris project with Vite + React 19 + Tailwind CSS + shadcn/ui frontend and Bun + Hono + Drizzle ORM backend. Single-user application — no authentication or role system. The app serves the built frontend and API from one Hono server.
+There is a design file at docs/design.md that specifies how the gui should look. Use that to create suitable tailwind themes
 
 ## Requirements
 
@@ -39,3 +40,4 @@ Initialize the Iris project with Vite + React 19 + Tailwind CSS + shadcn/ui fron
 - [ ] Configure Drizzle ORM with PostgreSQL | backend
 - [ ] Create Docker Compose for Postgres | infrastructure
 - [ ] Create app shell with sidebar navigation | frontend
+- [ ] Implement themes based on the design-spec in /docs
