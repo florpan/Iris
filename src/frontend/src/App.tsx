@@ -3,6 +3,7 @@ import { AppShell } from "./components/AppShell";
 import { LibraryPage } from "./pages/LibraryPage";
 import { FolderPage } from "./pages/FolderPage";
 import { SearchPage } from "./pages/SearchPage";
+import { BrowsePage } from "./pages/BrowsePage";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
@@ -33,6 +34,8 @@ function App() {
     page = <FolderPage />;
   } else if (path === "/search") {
     page = <SearchPage />;
+  } else if (path === "/browse") {
+    page = <BrowsePage />;
   } else {
     page = <LibraryPage />;
   }

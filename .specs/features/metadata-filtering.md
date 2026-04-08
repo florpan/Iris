@@ -1,7 +1,7 @@
 ---
 id: metadata-filtering
 title: Metadata Filtering & Faceted Browse
-status: ready
+status: in-progress
 milestone: browsing
 priority: medium
 handoff: single
@@ -24,16 +24,16 @@ Beyond search, provide faceted browsing where users can explore images by metada
 
 ## Acceptance Criteria
 
-- [ ] Camera model facet shows all models with image counts
-- [ ] Lens facet shows all lenses with counts
-- [ ] Year/month facet allows date-based drilling
-- [ ] Selecting one facet updates others to reflect the filtered set
-- [ ] Combined facets produce correct results
-- [ ] Stats dashboard shows collection overview
+- [x] Camera model facet shows all models with image counts
+- [x] Lens facet shows all lenses with counts
+- [x] Year/month facet allows date-based drilling
+- [x] Selecting one facet updates others to reflect the filtered set
+- [x] Combined facets produce correct results
+- [x] Stats dashboard shows collection overview
 
 ## Tasks
 
-- [ ] Create faceted query API with dynamic count updates | backend, api
-- [ ] Build facet panel components | frontend
-- [ ] Build stats dashboard component | frontend
-- [ ] Integrate faceted results with thumbnail grid | frontend
+- [x] Create faceted query API with dynamic count updates | backend, api
+- [x] Build facet panel components | frontend
+- [x] Build stats dashboard component | frontend
+- [x] Integrate faceted results with thumbnail grid | frontend

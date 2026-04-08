@@ -57,8 +57,12 @@ const searchVector = sql<string>`(
  *   maxWidth   — maximum image width in pixels
  *   minHeight  — minimum image height in pixels
  *   maxHeight  — maximum image height in pixels
- *   minSize    — minimum file size in bytes
- *   maxSize    — maximum file size in bytes
+ *   minSize         — minimum file size in bytes
+ *   maxSize         — maximum file size in bytes
+ *   focalLengthMin  — minimum focal length in mm
+ *   focalLengthMax  — maximum focal length in mm
+ *   isoMin          — minimum ISO value
+ *   isoMax          — maximum ISO value
  *   sort       — relevance | date | name | size (default: relevance when q set, else date)
  *   order      — asc | desc (default: desc)
  *   page       — page number (default: 1)
@@ -77,6 +81,10 @@ searchRouter.get("/", async (c) => {
   const maxHeight = c.req.query("maxHeight");
   const minSize = c.req.query("minSize");
   const maxSize = c.req.query("maxSize");
+  const focalLengthMin = c.req.query("focalLengthMin");
+  const focalLengthMax = c.req.query("focalLengthMax");
+  const isoMin = c.req.query("isoMin");
+  const isoMax = c.req.query("isoMax");
 
   const defaultSort: SortField = q ? "relevance" : "date";
   const sortRaw = (c.req.query("sort") ?? defaultSort) as SortField;
@@ -90,7 +98,8 @@ searchRouter.get("/", async (c) => {
 
   // Require at least one search parameter
   if (!q && !camera && !lens && !dateFrom && !dateTo && !format &&
-    !minWidth && !maxWidth && !minHeight && !maxHeight && !minSize && !maxSize) {
+    !minWidth && !maxWidth && !minHeight && !maxHeight && !minSize && !maxSize &&
+    !focalLengthMin && !focalLengthMax && !isoMin && !isoMax) {
     throw new HTTPException(400, { message: "At least one search parameter is required" });
   }
 
@@ -170,6 +179,26 @@ searchRouter.get("/", async (c) => {
   if (maxSize) {
     const v = Number(maxSize);
     if (Number.isFinite(v)) conditions.push(lte(images.fileSize, v));
+  }
+
+  // Focal length filters
+  if (focalLengthMin) {
+    const v = Number(focalLengthMin);
+    if (Number.isFinite(v)) conditions.push(gte(images.focalLength, v));
+  }
+  if (focalLengthMax) {
+    const v = Number(focalLengthMax);
+    if (Number.isFinite(v)) conditions.push(sql`${images.focalLength} < ${v}`);
+  }
+
+  // ISO filters
+  if (isoMin) {
+    const v = Number(isoMin);
+    if (Number.isFinite(v)) conditions.push(gte(images.iso, v));
+  }
+  if (isoMax) {
+    const v = Number(isoMax);
+    if (Number.isFinite(v)) conditions.push(sql`${images.iso} < ${v}`);
   }
 
   const whereClause = and(...conditions);

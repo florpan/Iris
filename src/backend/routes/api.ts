@@ -10,6 +10,7 @@ import { syncRouter } from "./sync";
 import { statsRouter } from "./stats";
 import { thumbnailsRouter } from "./thumbnails";
 import { searchRouter } from "./search";
+import { facetsRouter } from "./facets";
 
 export const apiRouter = new Hono();
 
@@ -27,3 +28,4 @@ apiRouter.route("/sync", syncRouter);
 apiRouter.route("/stats", statsRouter);
 apiRouter.route("/thumbnails", thumbnailsRouter);
 apiRouter.route("/search", searchRouter);
+apiRouter.route("/facets", facetsRouter);

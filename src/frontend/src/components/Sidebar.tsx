@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Aperture,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
@@ -25,6 +26,7 @@ const navItems: NavItem[] = [
   { icon: Images, label: "Library", href: "/" },
   { icon: FolderOpen, label: "Folders", href: "/folders" },
   { icon: Search, label: "Search", href: "/search" },
+  { icon: LayoutGrid, label: "Browse", href: "/browse" },
   { icon: Tags, label: "Tags", href: "/tags" },
   { icon: MapPin, label: "Map", href: "/map" },
 ];
