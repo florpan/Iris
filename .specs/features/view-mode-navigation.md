@@ -1,7 +1,7 @@
 ---
 id: view-mode-navigation
 title: View mode navigation
-status: ready
+status: in-progress
 milestone: views
 priority: medium
 handoff: single
@@ -19,8 +19,8 @@ State management and transitions between grid, map, and timeline display modes w
 
 ## Acceptance Criteria
 
-- [ ] Gap identified by flow analysis is resolved
+- [x] Gap identified by flow analysis is resolved
 
 ## Tasks
 
-- [ ] Implement feature | backend
+- [x] Implement feature | backend

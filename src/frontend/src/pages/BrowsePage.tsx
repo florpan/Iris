@@ -19,7 +19,9 @@ import { ImageDetailModal } from "@/components/ImageDetailModal";
 import { EmptyState } from "@/components/EmptyState";
 import type { GridDensity } from "@/components/ImageGrid";
 import { TimelineView } from "@/components/TimelineView";
+import { MapView } from "@/components/MapView";
 import { useAppState } from "@/hooks/useAppState";
+import { useMapConfig } from "@/hooks/useMapConfig";
 import {
   buildImageDetailUrl,
   saveScrollPosition,
@@ -198,6 +200,7 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: T
 export function BrowsePage() {
   const initial = parseUrlState();
   const { viewMode } = useAppState();
+  const mapConfig = useMapConfig();
 
   const [filters, setFilters] = useState<FacetFilters>(initial.filters);
   const [page, setPage] = useState(initial.page);
@@ -506,6 +509,21 @@ export function BrowsePage() {
           </div>
         </div>
 
+        {/* Map view */}
+        {viewMode === "map" && (
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <MapView
+              camera={filters.camera || undefined}
+              lens={filters.lens || undefined}
+              dateFrom={filters.dateFrom || undefined}
+              dateTo={filters.dateTo || undefined}
+              format={filters.format || undefined}
+              tileUrl={mapConfig.tileUrl}
+              tileAttribution={mapConfig.tileAttribution}
+            />
+          </div>
+        )}
+
         {/* Timeline view */}
         {viewMode === "timeline" && (
           <div className="flex-1 min-h-0 overflow-hidden">
@@ -523,7 +541,7 @@ export function BrowsePage() {
         )}
 
         {/* Image grid */}
-        <div ref={scrollContainerRef} className={cn("flex-1 overflow-y-auto", viewMode === "timeline" && "hidden")}>
+        <div ref={scrollContainerRef} className={cn("flex-1 overflow-y-auto", (viewMode === "timeline" || viewMode === "map") && "hidden")}>
           {imagesError ? (
             <div className="flex items-center justify-center h-48 text-sm text-red-500">
               {imagesError}
@@ -570,7 +588,7 @@ export function BrowsePage() {
         </div>
 
         {/* Pagination */}
-        {viewMode !== "timeline" && pagination && pagination.totalPages > 1 && (
+        {viewMode !== "timeline" && viewMode !== "map" && pagination && pagination.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-2.5 border-t border-[var(--color-border)] text-sm shrink-0">
             <span className="text-[var(--color-text-muted)]">
               Page {pagination.page} of {pagination.totalPages}
