@@ -1,7 +1,7 @@
 ---
 id: folder-navigation
 title: Folder-Based Navigation & Image Grid
-status: ready
+status: in-progress
 milestone: browsing
 priority: high
 handoff: single
@@ -37,21 +37,21 @@ Each folder in the tree shows the number of images (direct + recursive). This he
 
 ## Acceptance Criteria
 
-- [ ] Folder tree displays all configured sources with their directory hierarchy
-- [ ] Clicking a folder shows its images as a thumbnail grid
-- [ ] Breadcrumb shows current navigation path
-- [ ] Image count displayed per folder
-- [ ] Grid density adjustable
-- [ ] Large folders paginated/virtualized — no performance degradation at 1000+ images
-- [ ] Sort by name, date, size works correctly
-- [ ] Folder tree is responsive — collapses on mobile
+- [x] Folder tree displays all configured sources with their directory hierarchy
+- [x] Clicking a folder shows its images as a thumbnail grid
+- [x] Breadcrumb shows current navigation path
+- [x] Image count displayed per folder
+- [x] Grid density adjustable
+- [x] Large folders paginated/virtualized — no performance degradation at 1000+ images
+- [x] Sort by name, date, size works correctly
+- [x] Folder tree is responsive — collapses on mobile
 
 ## Tasks
 
-- [ ] Create API endpoint for folder tree structure with image counts | backend, api
-- [ ] Create API endpoint for paginated images in a folder | backend, api
-- [ ] Build sidebar folder tree component | frontend
-- [ ] Build breadcrumb navigation component | frontend
-- [ ] Build image thumbnail grid with configurable density | frontend
-- [ ] Implement virtual scrolling or pagination for large folders | frontend
-- [ ] Add sort controls | frontend
+- [x] Create API endpoint for folder tree structure with image counts | backend, api
+- [x] Create API endpoint for paginated images in a folder | backend, api
+- [x] Build sidebar folder tree component | frontend
+- [x] Build breadcrumb navigation component | frontend
+- [x] Build image thumbnail grid with configurable density | frontend
+- [x] Implement virtual scrolling or pagination for large folders | frontend
+- [x] Add sort controls | frontend

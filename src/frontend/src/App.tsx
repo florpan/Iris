@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { AppShell } from "./components/AppShell";
 import { LibraryPage } from "./pages/LibraryPage";
+import { FolderPage } from "./pages/FolderPage";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
@@ -26,9 +27,16 @@ function App() {
   // Simple client-side routing
   const path = window.location.pathname;
 
+  let page: ReactNode;
+  if (path === "/folders" || path.startsWith("/folders/")) {
+    page = <FolderPage />;
+  } else {
+    page = <LibraryPage />;
+  }
+
   return (
     <AppShell currentPath={path}>
-      <LibraryPage />
+      {page}
     </AppShell>
   );
 }
