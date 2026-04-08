@@ -1,7 +1,7 @@
 ---
 id: image-detail
 title: Image Detail View
-status: ready
+status: in-progress
 milestone: browsing
 priority: high
 handoff: single
@@ -33,20 +33,20 @@ Organized metadata panels: Camera info (model, lens, settings), File info (size,
 
 ## Acceptance Criteria
 
-- [ ] Full-resolution image displayed from source folder
-- [ ] RAW files show preview image
-- [ ] All extracted metadata displayed in organized sections
-- [ ] Camera, file, location, IPTC sections clearly separated
-- [ ] Previous/next navigation works within folder context
-- [ ] GPS coordinates shown on mini-map when available
-- [ ] Keyboard shortcuts work (arrows, escape)
+- [x] Full-resolution image displayed from source folder
+- [x] RAW files show preview image
+- [x] All extracted metadata displayed in organized sections
+- [x] Camera, file, location, IPTC sections clearly separated
+- [x] Previous/next navigation works within folder context
+- [x] GPS coordinates shown on mini-map when available
+- [x] Keyboard shortcuts work (arrows, escape)
 
 ## Tasks
 
-- [ ] Create streaming image serving endpoint (original from source) | backend, api
-- [ ] Handle RAW file preview serving | backend
-- [ ] Build detail view layout with image + metadata panels | frontend
-- [ ] Build metadata display components (camera, file, location, IPTC, raw) | frontend
-- [ ] Add GPS mini-map component using Leaflet | frontend
-- [ ] Implement prev/next navigation | frontend
-- [ ] Add keyboard shortcut support | frontend
+- [x] Create streaming image serving endpoint (original from source) | backend, api
+- [x] Handle RAW file preview serving | backend
+- [x] Build detail view layout with image + metadata panels | frontend
+- [x] Build metadata display components (camera, file, location, IPTC, raw) | frontend
+- [x] Add GPS mini-map component using Leaflet | frontend
+- [x] Implement prev/next navigation | frontend
+- [x] Add keyboard shortcut support | frontend

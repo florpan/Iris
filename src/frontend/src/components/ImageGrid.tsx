@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SelectedFolder } from "./FolderTree";
+import { ImageDetailModal } from "./ImageDetailModal";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -111,9 +112,10 @@ interface ThumbnailProps {
   isFocused: boolean;
   onFocus: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
+  onClick: () => void;
 }
 
-function Thumbnail({ image, density, isFocused, onFocus, onKeyDown }: ThumbnailProps) {
+function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: ThumbnailProps) {
   const [imgError, setImgError] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -136,6 +138,7 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown }: ThumbnailP
       )}
       onFocus={onFocus}
       onKeyDown={onKeyDown}
+      onClick={onClick}
     >
       {/* Thumbnail image */}
       {image.thumbnailPath && !imgError ? (
@@ -190,6 +193,9 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
+  // Detail view state
+  const [detailImageId, setDetailImageId] = useState<number | null>(null);
 
   // Reset page when folder or sort changes
   useEffect(() => {
@@ -256,13 +262,18 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
       else if (e.key === "ArrowLeft") next = Math.max(index - 1, 0);
       else if (e.key === "ArrowDown") next = Math.min(index + cols, images.length - 1);
       else if (e.key === "ArrowUp") next = Math.max(index - cols, 0);
+      else if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        setDetailImageId(images[index].id);
+        return;
+      }
 
       if (next !== null) {
         e.preventDefault();
         setFocusedIndex(next);
       }
     },
-    [density, images.length]
+    [density, images]
   );
 
   // ── Empty state ──────────────────────────────────────────────────────────────
@@ -384,6 +395,7 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
                     isFocused={focusedIndex === i}
                     onFocus={() => setFocusedIndex(i)}
                     onKeyDown={(e) => handleKeyDown(e, i)}
+                    onClick={() => setDetailImageId(image.id)}
                   />
                 ))}
           </div>
@@ -472,6 +484,16 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── Image detail modal ──────────────────────────────────────────────── */}
+      {detailImageId !== null && (
+        <ImageDetailModal
+          imageId={detailImageId}
+          imageIds={images.map((img) => img.id)}
+          onNavigate={(id) => setDetailImageId(id)}
+          onClose={() => setDetailImageId(null)}
+        />
       )}
     </div>
   );
