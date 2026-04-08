@@ -1,7 +1,7 @@
 ---
 id: image-detail
 title: Image Detail View
-status: in-progress
+status: complete
 milestone: browsing
 priority: high
 handoff: single
