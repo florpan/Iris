@@ -1,7 +1,7 @@
 ---
 id: view-mode-navigation
 title: View mode navigation
-status: in-progress
+status: complete
 milestone: views
 priority: medium
 handoff: single
