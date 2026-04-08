@@ -50,9 +50,17 @@ export const images = pgTable(
     latitude: real("latitude"),
     longitude: real("longitude"),
     altitude: real("altitude"),
+    // IPTC fields
+    iptcTitle: text("iptc_title"),
+    iptcDescription: text("iptc_description"),
+    iptcKeywords: jsonb("iptc_keywords").$type<string[]>(),
+    iptcCopyright: text("iptc_copyright"),
     // Extra metadata as JSON
     metadata: jsonb("metadata"),
+    // File tracking for incremental scan
+    fileModifiedAt: timestamp("file_modified_at"),
     // Indexing state
+    missing: boolean("missing").notNull().default(false),
     indexed: boolean("indexed").notNull().default(false),
     indexedAt: timestamp("indexed_at"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -95,3 +103,8 @@ export const settings = pgTable("settings", {
   value: jsonb("value"),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+// ── Type Helpers ─────────────────────────────────────────────────────────────
+export type Image = typeof images.$inferSelect;
+export type NewImage = typeof images.$inferInsert;
+export type SourceFolder = typeof sourceFolders.$inferSelect;

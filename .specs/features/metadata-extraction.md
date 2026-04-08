@@ -1,7 +1,7 @@
 ---
 id: metadata-extraction
 title: Image Metadata Extraction & Indexing
-status: ready
+status: in-progress
 milestone: foundation
 priority: high
 handoff: single
@@ -38,22 +38,22 @@ Track file modification time and size. On rescan, skip files that haven't change
 
 ## Acceptance Criteria
 
-- [ ] Scanning discovers all images in source folder hierarchy
-- [ ] EXIF data extracted (camera model, lens, exposure, ISO, focal length, date)
-- [ ] GPS coordinates extracted when available
-- [ ] IPTC data extracted (title, description, keywords)
-- [ ] File metadata stored (size, dimensions, format, modification date)
-- [ ] Camera RAW files (CR2, NEF, ARW, DNG) are supported
-- [ ] Incremental scan skips unchanged files
-- [ ] Missing files flagged but not deleted from database
-- [ ] Scan progress reported via API
+- [x] Scanning discovers all images in source folder hierarchy
+- [x] EXIF data extracted (camera model, lens, exposure, ISO, focal length, date)
+- [x] GPS coordinates extracted when available
+- [x] IPTC data extracted (title, description, keywords)
+- [x] File metadata stored (size, dimensions, format, modification date)
+- [x] Camera RAW files (CR2, NEF, ARW, DNG) are supported
+- [x] Incremental scan skips unchanged files
+- [x] Missing files flagged but not deleted from database
+- [x] Scan progress reported via API
 
 ## Tasks
 
-- [ ] Create database schema for images and metadata | backend, database
-- [ ] Implement recursive directory scanner with format detection | backend
-- [ ] Implement metadata extraction using exifr | backend
-- [ ] Handle camera RAW metadata extraction | backend
-- [ ] Implement incremental scan with change detection | backend
-- [ ] Create scan API endpoints (trigger, progress, status) | backend, api
-- [ ] Add missing file detection on rescan | backend
+- [x] Create database schema for images and metadata | backend, database
+- [x] Implement recursive directory scanner with format detection | backend
+- [x] Implement metadata extraction using exifr | backend
+- [x] Handle camera RAW metadata extraction | backend
+- [x] Implement incremental scan with change detection | backend
+- [x] Create scan API endpoints (trigger, progress, status) | backend, api
+- [x] Add missing file detection on rescan | backend
