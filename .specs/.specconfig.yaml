@@ -1,0 +1,14 @@
+project: Iris
+spec_dir: .specs/features
+templates:
+  - feature
+
+standards:
+  techstack: {}
+  conventions:
+    prefer: []
+    avoid: []
+  requirements:
+    require_acceptance_criteria: true
+    require_technical_design: false
+    max_tasks_per_feature: 10
