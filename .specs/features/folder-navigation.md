@@ -1,7 +1,7 @@
 ---
 id: folder-navigation
 title: Folder-Based Navigation & Image Grid
-status: in-progress
+status: complete
 milestone: browsing
 priority: high
 handoff: single
