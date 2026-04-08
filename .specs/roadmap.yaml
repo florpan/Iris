@@ -1,4 +1,28 @@
 milestones:
+  - id: foundation
+    title: Foundation
+    target: MVP
+    status: planned
+    description: Core infrastructure — project setup, database, source management, metadata extraction, thumbnail generation
+
+  - id: browsing
+    title: Browsing & Display
+    target: MVP
+    status: planned
+    description: Frontend views — folder navigation, image grid, detail view, search
+
+  - id: views
+    title: Advanced Views
+    target: Post-MVP
+    status: planned
+    description: Map view, timeline view, and advanced filtering
+
+  - id: smart
+    title: Smart Features
+    target: Future
+    status: planned
+    description: Tagging, embeddings, facial recognition, smart search
+
   - id: backlog
     title: Backlog
     target: TBD
