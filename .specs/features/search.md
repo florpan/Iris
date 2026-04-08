@@ -1,7 +1,7 @@
 ---
 id: search
 title: Search — Metadata & Filename
-status: in-progress
+status: complete
 milestone: browsing
 priority: high
 handoff: single
