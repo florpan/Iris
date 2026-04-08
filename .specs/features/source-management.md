@@ -1,7 +1,7 @@
 ---
 id: source-management
 title: Source Folder & Work Folder Configuration
-status: in-progress
+status: complete
 milestone: foundation
 priority: high
 handoff: single
