@@ -1,7 +1,7 @@
 ---
 id: api-layer
 title: Core API Layer — Routes, Image Serving, Shared Patterns
-status: ready
+status: in-progress
 milestone: foundation
 priority: high
 handoff: single
@@ -69,22 +69,22 @@ All list endpoints support `?page=1&pageSize=50`. Default page size 50, max 200.
 
 ## Acceptance Criteria
 
-- [ ] `/api/health` responds with server status
-- [ ] `/api/config` returns configured sources and work folder
-- [ ] `/api/images/:id/original` streams image from source folder with correct content type
-- [ ] `/api/images/:id/original` serves JPEG preview for RAW files
-- [ ] `/api/images/:id/thumb` serves thumbnail from work folder
-- [ ] Thumbnail responses include cache headers
-- [ ] List endpoints support pagination with consistent response format
-- [ ] Errors return JSON `{ error: "message" }` with appropriate HTTP status
-- [ ] Source folder unavailability handled gracefully (503 for that source, not crash)
+- [x] `/api/health` responds with server status
+- [x] `/api/config` returns configured sources and work folder
+- [x] `/api/images/:id/original` streams image from source folder with correct content type
+- [x] `/api/images/:id/original` serves JPEG preview for RAW files
+- [x] `/api/images/:id/thumb` serves thumbnail from work folder
+- [x] Thumbnail responses include cache headers
+- [x] List endpoints support pagination with consistent response format
+- [x] Errors return JSON `{ error: "message" }` with appropriate HTTP status
+- [x] Source folder unavailability handled gracefully (503 for that source, not crash)
 
 ## Tasks
 
-- [ ] Set up Hono route groups and mount points | backend
-- [ ] Implement shared error handling middleware | backend
-- [ ] Implement pagination helper for list endpoints | backend
-- [ ] Create health check and config endpoints | backend, api
-- [ ] Create image original streaming endpoint with RAW preview support | backend, api
-- [ ] Create thumbnail serving endpoint with cache headers | backend, api
-- [ ] Create source status endpoint | backend, api
+- [x] Set up Hono route groups and mount points | backend
+- [x] Implement shared error handling middleware | backend
+- [x] Implement pagination helper for list endpoints | backend
+- [x] Create health check and config endpoints | backend, api
+- [x] Create image original streaming endpoint with RAW preview support | backend, api
+- [x] Create thumbnail serving endpoint with cache headers | backend, api
+- [x] Create source status endpoint | backend, api

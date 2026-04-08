@@ -1,43 +1,25 @@
 import { Hono } from "hono";
-import { db } from "../db/client";
+import { errorHandler } from "../middleware/error";
+import { healthRouter } from "./health";
+import { configRouter } from "./config";
+import { sourcesRouter } from "./sources";
+import { imagesRouter } from "./images";
+import { foldersRouter } from "./folders";
+import { tagsRouter } from "./tags";
+import { syncRouter } from "./sync";
+import { statsRouter } from "./stats";
 
 export const apiRouter = new Hono();
 
-// Health check
-apiRouter.get("/health", async (c) => {
-  // Probe DB connection
-  let dbStatus: "ok" | "error" = "error";
-  let dbError: string | undefined;
+// Global error handler for all API routes
+apiRouter.onError(errorHandler);
 
-  try {
-    await db.execute("SELECT 1");
-    dbStatus = "ok";
-  } catch (err) {
-    dbError = err instanceof Error ? err.message : String(err);
-  }
-
-  const status = dbStatus === "ok" ? 200 : 503;
-
-  return c.json(
-    {
-      status: dbStatus === "ok" ? "ok" : "degraded",
-      timestamp: new Date().toISOString(),
-      services: {
-        database: {
-          status: dbStatus,
-          ...(dbError ? { error: dbError } : {}),
-        },
-      },
-    },
-    status
-  );
-});
-
-// Version / app info
-apiRouter.get("/info", (c) => {
-  return c.json({
-    name: "Iris",
-    version: "0.1.0",
-    description: "Self-hosted image search and organizer",
-  });
-});
+// ── Route Groups ────────────────────────────────────────────────────────────
+apiRouter.route("/health", healthRouter);
+apiRouter.route("/config", configRouter);
+apiRouter.route("/sources", sourcesRouter);
+apiRouter.route("/images", imagesRouter);
+apiRouter.route("/folders", foldersRouter);
+apiRouter.route("/tags", tagsRouter);
+apiRouter.route("/sync", syncRouter);
+apiRouter.route("/stats", statsRouter);
