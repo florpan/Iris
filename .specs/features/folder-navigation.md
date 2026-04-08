@@ -1,11 +1,12 @@
 ---
 id: folder-navigation
 title: Folder-Based Navigation & Image Grid
-status: pending
+status: ready
 milestone: browsing
 priority: high
 handoff: single
 dependsOn: thumbnail-generation
+depends_on: sync-engine
 ---
 
 ## Overview

@@ -1,11 +1,12 @@
 ---
 id: metadata-filtering
 title: Metadata Filtering & Faceted Browse
-status: pending
+status: ready
 milestone: browsing
 priority: medium
 handoff: single
 dependsOn: search
+depends_on: search
 ---
 
 ## Overview

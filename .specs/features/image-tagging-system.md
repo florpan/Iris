@@ -1,12 +1,13 @@
 ---
 id: image-tagging-system
 title: Image Tagging System
-status: draft
+status: ready
 milestone: browsing
 priority: high
-depends_on: image-metadata-display
+depends_on: image-metadata-display, sync-engine
 handoff: single
 ---
+
 ## Overview
 
 A foundational tagging system that allows users to add, manage, and organize custom tags on images. Provides the data layer and core functionality for tag-based filtering, bulk operations, and tag management interfaces. Tags are stored separately from EXIF metadata and can be applied to any image regardless of its original metadata.

@@ -1,11 +1,12 @@
 ---
 id: api-layer
 title: Core API Layer — Routes, Image Serving, Shared Patterns
-status: pending
+status: ready
 milestone: foundation
 priority: high
 handoff: single
 dependsOn: project-setup, source-management
+depends_on: project-setup
 ---
 
 ## Overview

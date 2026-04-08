@@ -1,11 +1,12 @@
 ---
 id: timeline-view
 title: Timeline View — Chronological Image Display
-status: pending
+status: ready
 milestone: views
 priority: medium
 handoff: single
 dependsOn: folder-navigation, search
+depends_on: detail-view-navigation
 ---
 
 ## Overview

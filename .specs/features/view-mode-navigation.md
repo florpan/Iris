@@ -1,10 +1,11 @@
 ---
 id: view-mode-navigation
 title: View mode navigation
-status: draft
+status: ready
 milestone: views
 priority: medium
 handoff: single
+depends_on: detail-view-navigation
 ---
 
 ## Overview

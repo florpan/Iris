@@ -1,11 +1,12 @@
 ---
 id: map-view
 title: Map View — GPS-Based Image Display
-status: pending
+status: ready
 milestone: views
 priority: medium
 handoff: single
 dependsOn: folder-navigation, search
+depends_on: detail-view-navigation
 ---
 
 ## Overview

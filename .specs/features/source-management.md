@@ -6,7 +6,7 @@ milestone: foundation
 priority: high
 handoff: single
 dependsOn: project-setup
-depends_on: project-setup
+depends_on: api-layer
 ---
 
 ## Overview

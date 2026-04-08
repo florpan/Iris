@@ -1,7 +1,7 @@
 ---
 id: detail-view-navigation
 title: Detail view navigation
-status: draft
+status: ready
 milestone: browsing
 priority: medium
 depends_on: image-detail, context-aware-return-navigation

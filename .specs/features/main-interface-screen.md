@@ -1,7 +1,7 @@
 ---
 id: main-interface-screen
 title: Main interface screen
-status: draft
+status: ready
 milestone: browsing
 priority: high
 depends_on: folder-navigation, search, metadata-filtering

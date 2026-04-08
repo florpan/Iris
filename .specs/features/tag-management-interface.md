@@ -1,7 +1,7 @@
 ---
 id: tag-management-interface
 title: Tag Management Interface
-status: draft
+status: ready
 milestone: browsing
 priority: low
 depends_on: image-tagging-system

@@ -1,11 +1,12 @@
 ---
 id: search
 title: Search — Metadata & Filename
-status: pending
+status: ready
 milestone: browsing
 priority: high
 handoff: single
 dependsOn: metadata-extraction
+depends_on: folder-navigation
 ---
 
 ## Overview

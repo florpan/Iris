@@ -1,11 +1,12 @@
 ---
 id: image-detail
 title: Image Detail View
-status: pending
+status: ready
 milestone: browsing
 priority: high
 handoff: single
 dependsOn: folder-navigation
+depends_on: folder-navigation
 ---
 
 ## Overview
