@@ -1,7 +1,7 @@
 ---
 id: map-view
 title: Map View — GPS-Based Image Display
-status: in-progress
+status: complete
 milestone: views
 priority: medium
 handoff: single
