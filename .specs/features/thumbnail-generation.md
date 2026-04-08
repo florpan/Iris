@@ -1,7 +1,7 @@
 ---
 id: thumbnail-generation
 title: Thumbnail Generation
-status: in-progress
+status: complete
 milestone: foundation
 priority: high
 handoff: single
