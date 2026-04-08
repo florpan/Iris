@@ -104,7 +104,54 @@ export const settings = pgTable("settings", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ── Sync Runs (history) ───────────────────────────────────────────────────────
+// Records each completed sync scan for audit/history purposes.
+export const syncRuns = pgTable(
+  "sync_runs",
+  {
+    id: serial("id").primaryKey(),
+    // null = all-sources scan; non-null = single source scan
+    sourceFolderId: integer("source_folder_id").references(
+      () => sourceFolders.id,
+      { onDelete: "set null" }
+    ),
+    trigger: text("trigger").notNull().default("manual"), // "manual" | "scheduled"
+    status: text("status").notNull().default("running"), // "running" | "completed" | "error"
+    scanned: integer("scanned").notNull().default(0),
+    added: integer("added").notNull().default(0),
+    updated: integer("updated").notNull().default(0),
+    skipped: integer("skipped").notNull().default(0),
+    missing: integer("missing").notNull().default(0),
+    errorCount: integer("error_count").notNull().default(0),
+    errors: jsonb("errors").$type<string[]>().default([]),
+    startedAt: timestamp("started_at").notNull().defaultNow(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => [
+    index("sync_runs_started_at_idx").on(table.startedAt),
+    index("sync_runs_source_folder_idx").on(table.sourceFolderId),
+  ]
+);
+
+// ── Source Sync Status ────────────────────────────────────────────────────────
+// Tracks per-source sync status: last sync time and availability.
+export const sourceSyncStatus = pgTable("source_sync_status", {
+  sourceFolderId: integer("source_folder_id")
+    .primaryKey()
+    .references(() => sourceFolders.id, { onDelete: "cascade" }),
+  lastSyncAt: timestamp("last_sync_at"),
+  lastSyncRunId: integer("last_sync_run_id").references(() => syncRuns.id, {
+    onDelete: "set null",
+  }),
+  available: boolean("available").notNull().default(true),
+  unavailableReason: text("unavailable_reason"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // ── Type Helpers ─────────────────────────────────────────────────────────────
 export type Image = typeof images.$inferSelect;
 export type NewImage = typeof images.$inferInsert;
 export type SourceFolder = typeof sourceFolders.$inferSelect;
+export type SyncRun = typeof syncRuns.$inferSelect;
+export type NewSyncRun = typeof syncRuns.$inferInsert;
+export type SourceSyncStatus = typeof sourceSyncStatus.$inferSelect;

@@ -13,6 +13,7 @@ import * as path from "node:path";
 import { loadConfig } from "./config";
 import { db } from "../db/client";
 import { sourceFolders } from "../db/schema";
+import { startSyncScheduler } from "./sync-scheduler";
 
 export interface StartupResult {
   workFolder: string;
@@ -159,6 +160,15 @@ export async function runStartup(): Promise<StartupResult> {
 
   // ── Sync sources to DB ──────────────────────────────────────────────────────
   await syncSourcesToDb(config.sources);
+
+  // ── Start background sync scheduler ─────────────────────────────────────────
+  // Runs in the background — non-fatal if it fails to start
+  startSyncScheduler().catch((err) => {
+    console.warn(
+      "[startup] Sync scheduler failed to start (non-fatal):",
+      err instanceof Error ? err.message : err
+    );
+  });
 
   return result;
 }

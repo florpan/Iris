@@ -9,7 +9,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { db } from "../db/client";
-import { images, sourceFolders } from "../db/schema";
+import { images, sourceFolders, syncRuns, sourceSyncStatus } from "../db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { extractMetadata } from "./metadata";
 import { generateThumbnail, loadThumbnailSettings } from "./thumbnailer";
@@ -164,20 +164,69 @@ export function getMimeType(filePath: string): string {
 // ── Scan a single source folder ──────────────────────────────────────────────
 
 /**
+ * Upsert the source_sync_status row for a given source.
+ */
+async function upsertSourceSyncStatus(
+  sourceFolderId: number,
+  available: boolean,
+  reason: string | null,
+  syncRunId: number | null
+): Promise<void> {
+  try {
+    const now = new Date();
+    await db
+      .insert(sourceSyncStatus)
+      .values({
+        sourceFolderId,
+        available,
+        unavailableReason: reason,
+        lastSyncAt: available ? now : undefined,
+        lastSyncRunId: syncRunId,
+        updatedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: sourceSyncStatus.sourceFolderId,
+        set: {
+          available,
+          unavailableReason: reason,
+          lastSyncAt: available ? now : undefined,
+          lastSyncRunId: syncRunId,
+          updatedAt: now,
+        },
+      });
+  } catch (err) {
+    // Non-fatal — log and continue
+    console.warn(
+      "[scanner] Failed to update source sync status:",
+      err instanceof Error ? err.message : err
+    );
+  }
+}
+
+/**
  * Scan a single source folder: discover images, extract metadata, upsert
  * records, detect missing files.
  */
-async function scanSource(source: { id: number; path: string; name: string }): Promise<void> {
+async function scanSource(
+  source: { id: number; path: string; name: string },
+  syncRunId: number | null
+): Promise<void> {
   currentScan.sourceId = source.id;
   currentScan.sourceName = source.name;
 
   // Verify source is accessible
   try {
     fs.accessSync(source.path, fs.constants.R_OK);
-  } catch {
-    currentScan.errors.push(`Source '${source.name}' is not accessible at path: ${source.path}`);
+  } catch (accessErr) {
+    const reason = `Source '${source.name}' is not accessible at path: ${source.path}`;
+    currentScan.errors.push(reason);
+    // Mark source as unavailable in DB — no data loss, just status tracking
+    await upsertSourceSyncStatus(source.id, false, reason, syncRunId);
     return;
   }
+
+  // Source is accessible — mark as available
+  await upsertSourceSyncStatus(source.id, true, null, syncRunId);
 
   // Load thumbnail settings once per source
   const thumbSettings = await loadThumbnailSettings();
@@ -342,8 +391,14 @@ async function scanSource(source: { id: number; path: string; name: string }): P
  *
  * Runs asynchronously in the background. Returns immediately.
  * Use getScanProgress() to poll status.
+ *
+ * @param sourceId  Optional source folder ID. If omitted, all sources are scanned.
+ * @param trigger   "manual" (default) or "scheduled"
  */
-export async function triggerScan(sourceId?: number): Promise<{ started: boolean; reason?: string }> {
+export async function triggerScan(
+  sourceId?: number,
+  trigger: "manual" | "scheduled" = "manual"
+): Promise<{ started: boolean; reason?: string; syncRunId?: number }> {
   if (scanRunning) {
     return { started: false, reason: "A scan is already in progress" };
   }
@@ -374,6 +429,24 @@ export async function triggerScan(sourceId?: number): Promise<{ started: boolean
     return { started: false, reason: "No enabled source folders found" };
   }
 
+  // Create a sync_runs record to track this scan
+  let syncRunId: number | null = null;
+  try {
+    const [runRecord] = await db
+      .insert(syncRuns)
+      .values({
+        sourceFolderId: sourceId ?? null,
+        trigger,
+        status: "running",
+        startedAt: new Date(),
+      })
+      .returning({ id: syncRuns.id });
+    syncRunId = runRecord?.id ?? null;
+  } catch (err) {
+    // Non-fatal — continue without DB tracking
+    console.warn("[scanner] Could not create sync_run record:", err instanceof Error ? err.message : err);
+  }
+
   // Reset progress state
   currentScan = {
     status: "scanning",
@@ -390,20 +463,43 @@ export async function triggerScan(sourceId?: number): Promise<{ started: boolean
 
   // Run scan in background (fire-and-forget)
   (async () => {
+    let finalStatus: "completed" | "error" = "completed";
     try {
       for (const source of sources) {
-        await scanSource(source);
+        await scanSource(source, syncRunId);
       }
       currentScan.status = "idle";
       currentScan.completedAt = new Date();
     } catch (err) {
+      finalStatus = "error";
       currentScan.status = "error";
       currentScan.errorMessage = err instanceof Error ? err.message : String(err);
       currentScan.completedAt = new Date();
     } finally {
       scanRunning = false;
+      // Update the sync_run record with final counts
+      if (syncRunId !== null) {
+        try {
+          await db
+            .update(syncRuns)
+            .set({
+              status: finalStatus,
+              scanned: currentScan.scanned,
+              added: currentScan.added,
+              updated: currentScan.updated,
+              skipped: currentScan.skipped,
+              missing: currentScan.missing,
+              errorCount: currentScan.errors.length,
+              errors: currentScan.errors,
+              completedAt: currentScan.completedAt ?? new Date(),
+            })
+            .where(eq(syncRuns.id, syncRunId));
+        } catch (dbErr) {
+          console.warn("[scanner] Could not update sync_run record:", dbErr instanceof Error ? dbErr.message : dbErr);
+        }
+      }
     }
   })();
 
-  return { started: true };
+  return { started: true, syncRunId: syncRunId ?? undefined };
 }

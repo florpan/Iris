@@ -1,7 +1,7 @@
 ---
 id: sync-engine
 title: Sync Engine — Source Monitoring & Incremental Updates
-status: ready
+status: in-progress
 milestone: foundation
 priority: medium
 handoff: single
@@ -38,20 +38,20 @@ Sync runs as a background task. The UI stays responsive. Progress updates via SS
 
 ## Acceptance Criteria
 
-- [ ] Scheduled sync runs at configured interval
-- [ ] Manual sync can be triggered from UI
-- [ ] New files discovered and fully indexed (metadata + thumbnail)
-- [ ] Modified files re-indexed
-- [ ] Removed files marked as missing (not deleted from DB)
-- [ ] Sync progress visible in UI
-- [ ] Sync history available showing past sync results
-- [ ] Network share disconnect handled gracefully (source marked unavailable, no data loss)
+- [x] Scheduled sync runs at configured interval
+- [x] Manual sync can be triggered from UI
+- [x] New files discovered and fully indexed (metadata + thumbnail)
+- [x] Modified files re-indexed
+- [x] Removed files marked as missing (not deleted from DB)
+- [x] Sync progress visible in UI
+- [x] Sync history available showing past sync results
+- [x] Network share disconnect handled gracefully (source marked unavailable, no data loss)
 
 ## Tasks
 
-- [ ] Implement incremental file change detection (mtime + size) | backend
-- [ ] Create background sync runner with configurable interval | backend
-- [ ] Create sync status tracking and history tables | backend, database
-- [ ] Create sync API endpoints (trigger, status, history) | backend, api
-- [ ] Build sync status indicator in UI | frontend
-- [ ] Handle source unavailability gracefully | backend
+- [x] Implement incremental file change detection (mtime + size) | backend
+- [x] Create background sync runner with configurable interval | backend
+- [x] Create sync status tracking and history tables | backend, database
+- [x] Create sync API endpoints (trigger, status, history) | backend, api
+- [x] Build sync status indicator in UI | frontend
+- [x] Handle source unavailability gracefully | backend

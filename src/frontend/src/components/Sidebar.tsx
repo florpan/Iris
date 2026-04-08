@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
+import { SyncStatusWidget } from "./SyncStatusWidget";
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -90,6 +91,17 @@ export function Sidebar({ currentPath = "/" }: SidebarProps) {
 
       {/* Bottom section */}
       <div className="px-2 pb-3 space-y-0.5 border-t border-[var(--sidebar-border)] pt-2">
+        {/* Sync status */}
+        {!collapsed ? (
+          <div className="border-b border-[var(--sidebar-border)] mb-1 pb-1">
+            <SyncStatusWidget collapsed={false} />
+          </div>
+        ) : (
+          <div className="flex justify-center py-1">
+            <SyncStatusWidget collapsed={true} />
+          </div>
+        )}
+
         {/* Theme toggle */}
         {!collapsed && (
           <div className="px-3 py-2">
