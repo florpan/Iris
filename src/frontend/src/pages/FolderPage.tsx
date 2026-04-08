@@ -18,6 +18,7 @@ import { FolderTree, type SelectedFolder } from "@/components/FolderTree";
 import { FolderBreadcrumb } from "@/components/FolderBreadcrumb";
 import { ImageGrid, type GridDensity } from "@/components/ImageGrid";
 import { MapView } from "@/components/MapView";
+import { TimelineView } from "@/components/TimelineView";
 import { popFolderRestoreState } from "@/hooks/useNavigationContext";
 import { useAppState } from "@/hooks/useAppState";
 import { useMapConfig } from "@/hooks/useMapConfig";
@@ -96,7 +97,7 @@ export function FolderPage() {
           />
         </div>
 
-        {/* Image grid or Map view */}
+        {/* Image grid, Map view, or Timeline view */}
         <div className="flex-1 min-h-0 overflow-hidden">
           {viewMode === "map" ? (
             <MapView
@@ -104,6 +105,14 @@ export function FolderPage() {
               folderPath={selected?.path ?? null}
               tileUrl={mapConfig.tileUrl}
               tileAttribution={mapConfig.tileAttribution}
+            />
+          ) : viewMode === "timeline" ? (
+            <TimelineView
+              filters={{
+                sourceId: selected?.sourceId ?? null,
+                folderPath: selected?.path ?? null,
+              }}
+              returnContext="folder"
             />
           ) : (
             <ImageGrid

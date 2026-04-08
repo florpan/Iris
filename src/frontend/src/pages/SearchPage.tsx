@@ -36,6 +36,7 @@ import {
 } from "@/hooks/useNavigationContext";
 import { useAppState } from "@/hooks/useAppState";
 import { useMapConfig } from "@/hooks/useMapConfig";
+import { TimelineView } from "@/components/TimelineView";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -592,7 +593,26 @@ export function SearchPage() {
         </div>
       )}
 
-      <div ref={scrollContainerRef} className={cn("flex-1 overflow-y-auto", viewMode === "map" && "hidden")}>
+      {/* Timeline view */}
+      {viewMode === "timeline" && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <TimelineView
+            filters={{
+              q: submittedQuery || undefined,
+              camera: filters.camera || undefined,
+              lens: filters.lens || undefined,
+              dateFrom: filters.dateFrom || undefined,
+              dateTo: filters.dateTo || undefined,
+              format: filters.format || undefined,
+              minSize: filters.minSize || undefined,
+              maxSize: filters.maxSize || undefined,
+            }}
+            returnContext="search"
+          />
+        </div>
+      )}
+
+      <div ref={scrollContainerRef} className={cn("flex-1 overflow-y-auto", (viewMode === "map" || viewMode === "timeline") && "hidden")}>
         {!hasSearched ? (
           <EmptyState.SearchPrompt />
         ) : error ? (
@@ -635,7 +655,7 @@ export function SearchPage() {
       </div>
 
       {/* ── Pagination ───────────────────────────────────────────────────────── */}
-      {viewMode !== "map" && pagination && pagination.totalPages > 1 && (
+      {viewMode !== "map" && viewMode !== "timeline" && pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-2.5 border-t border-[var(--color-border)] text-sm shrink-0">
           <span className="text-[var(--color-text-muted)]">
             Page {pagination.page} of {pagination.totalPages}

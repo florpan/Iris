@@ -1,7 +1,7 @@
 ---
 id: timeline-view
 title: Timeline View — Chronological Image Display
-status: ready
+status: in-progress
 milestone: views
 priority: medium
 handoff: single
@@ -37,19 +37,19 @@ For large collections spanning years, the timeline must be virtualized. Only ren
 
 ## Acceptance Criteria
 
-- [ ] Images grouped by date with year/month/day levels
-- [ ] Zoom between grouping levels
-- [ ] Day level shows full image grid
-- [ ] Timeline works with folder, search, and filter results
-- [ ] Large collections (years of images) scroll smoothly
-- [ ] Jump-to-date navigates to specific date
-- [ ] Date source shown (EXIF date vs file date)
+- [x] Images grouped by date with year/month/day levels
+- [x] Zoom between grouping levels
+- [x] Day level shows full image grid
+- [x] Timeline works with folder, search, and filter results
+- [x] Large collections (years of images) scroll smoothly
+- [x] Jump-to-date navigates to specific date
+- [x] Date source shown (EXIF date vs file date)
 
 ## Tasks
 
-- [ ] Create API endpoint for date-grouped image data | backend, api
-- [ ] Build timeline layout component with grouping levels | frontend
-- [ ] Implement zoom between year/month/day levels | frontend
-- [ ] Add virtual scrolling for large timelines | frontend
-- [ ] Build jump-to-date control | frontend
-- [ ] Add timeline view toggle to folder/search/filter views | frontend
+- [x] Create API endpoint for date-grouped image data | backend, api
+- [x] Build timeline layout component with grouping levels | frontend
+- [x] Implement zoom between year/month/day levels | frontend
+- [x] Add virtual scrolling for large timelines | frontend
+- [x] Build jump-to-date control | frontend
+- [x] Add timeline view toggle to folder/search/filter views | frontend
