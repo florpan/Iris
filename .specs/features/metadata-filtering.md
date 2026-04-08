@@ -1,7 +1,7 @@
 ---
 id: metadata-filtering
 title: Metadata Filtering & Faceted Browse
-status: in-progress
+status: complete
 milestone: browsing
 priority: medium
 handoff: single
