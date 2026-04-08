@@ -1,11 +1,12 @@
 ---
 id: thumbnail-generation
 title: Thumbnail Generation
-status: pending
+status: ready
 milestone: foundation
 priority: high
 handoff: single
 dependsOn: metadata-extraction
+depends_on: metadata-extraction
 ---
 
 ## Overview

@@ -1,11 +1,12 @@
 ---
 id: source-management
 title: Source Folder & Work Folder Configuration
-status: pending
+status: ready
 milestone: foundation
 priority: high
 handoff: single
 dependsOn: project-setup
+depends_on: project-setup
 ---
 
 ## Overview

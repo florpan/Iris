@@ -1,11 +1,12 @@
 ---
 id: metadata-extraction
 title: Image Metadata Extraction & Indexing
-status: pending
+status: ready
 milestone: foundation
 priority: high
 handoff: single
 dependsOn: source-management
+depends_on: source-management
 ---
 
 ## Overview

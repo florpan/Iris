@@ -1,11 +1,12 @@
 ---
 id: sync-engine
 title: Sync Engine — Source Monitoring & Incremental Updates
-status: pending
+status: ready
 milestone: foundation
 priority: medium
 handoff: single
 dependsOn: metadata-extraction, thumbnail-generation
+depends_on: thumbnail-generation
 ---
 
 ## Overview
