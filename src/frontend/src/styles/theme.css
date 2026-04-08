@@ -1,0 +1,270 @@
+/*
+ * Iris Theme System
+ * Based on MiniMax design language from docs/Design.md
+ *
+ * Fonts: DM Sans (UI), Outfit (display), Poppins (mid-tier), Roboto (data)
+ * Colors: Brand blue #1456f0, Brand pink #ea5ec1
+ * Radius: pills (9999px) for nav/tabs, 8px for CTA, 20-24px for cards
+ */
+
+/* ─── Light Theme (default) ─────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+
+  /* ── Primitives ── */
+  --iris-white: #ffffff;
+  --iris-near-black: #222222;
+  --iris-dark: #18181b;
+  --iris-charcoal: #181e25;
+
+  /* ── Brand ── */
+  --iris-brand: #1456f0;
+  --iris-brand-sky: #3daeff;
+  --iris-brand-pink: #ea5ec1;
+  --iris-brand-deep: #17437d;
+
+  /* ── Primary Scale ── */
+  --iris-primary-200: #bfdbfe;
+  --iris-primary-light: #60a5fa;
+  --iris-primary-500: #3b82f6;
+  --iris-primary-600: #2563eb;
+  --iris-primary-700: #1d4ed8;
+
+  /* ── Text ── */
+  --iris-text-primary: #222222;
+  --iris-text-heading: #18181b;
+  --iris-text-secondary: #45515e;
+  --iris-text-muted: #8e8e93;
+  --iris-text-helper: #5f5f5f;
+  --iris-text-on-dark: rgba(255, 255, 255, 0.8);
+
+  /* ── Backgrounds ── */
+  --iris-bg: #ffffff;
+  --iris-bg-secondary: #f0f0f0;
+  --iris-bg-glass: hsla(0, 0%, 100%, 0.4);
+  --iris-bg-dark: #181e25;
+  --iris-bg-footer: #181e25;
+  --iris-success-bg: #e8ffea;
+
+  /* ── Borders ── */
+  --iris-border-light: #f2f3f5;
+  --iris-border: #e5e7eb;
+
+  /* ── Buttons ── */
+  --iris-btn-primary-bg: #181e25;
+  --iris-btn-primary-text: #ffffff;
+  --iris-btn-primary-hover: #2d3748;
+  --iris-btn-nav-bg: rgba(0, 0, 0, 0.05);
+  --iris-btn-nav-text: #18181b;
+  --iris-btn-secondary-bg: #f0f0f0;
+  --iris-btn-secondary-text: #333333;
+  --iris-btn-secondary-hover: #e0e0e0;
+
+  /* ── Shadows ── */
+  --iris-shadow-standard: rgba(0, 0, 0, 0.08) 0px 4px 6px;
+  --iris-shadow-soft: rgba(0, 0, 0, 0.08) 0px 0px 22.576px;
+  --iris-shadow-brand: rgba(44, 30, 116, 0.16) 0px 0px 15px;
+  --iris-shadow-brand-offset: rgba(44, 30, 116, 0.11) 6.5px 2px 17.5px;
+  --iris-shadow-elevated: rgba(36, 36, 36, 0.08) 0px 12px 16px -4px;
+
+  /* ── Radius ── */
+  --iris-radius-xs: 4px;    /* small tags, micro badges */
+  --iris-radius-sm: 8px;    /* buttons, small cards */
+  --iris-radius-md: 12px;   /* medium cards, panels */
+  --iris-radius-lg: 16px;   /* large cards */
+  --iris-radius-xl: 20px;   /* product cards */
+  --iris-radius-2xl: 24px;  /* hero cards, major containers */
+  --iris-radius-pill: 32px; /* badge pills, rounded panels */
+  --iris-radius-full: 9999px; /* nav tabs, toggle buttons */
+
+  /* ── Typography Scale ── */
+  --iris-text-micro: 0.625rem;   /* 10px */
+  --iris-text-xs: 0.75rem;       /* 12px */
+  --iris-text-sm: 0.8125rem;     /* 13px */
+  --iris-text-nav: 0.875rem;     /* 14px */
+  --iris-text-base: 1rem;        /* 16px */
+  --iris-text-lg: 1.125rem;      /* 18px */
+  --iris-text-xl: 1.25rem;       /* 20px */
+  --iris-text-card: 1.75rem;     /* 28px */
+  --iris-text-section: 1.9375rem; /* 31px */
+  --iris-text-section-alt: 2rem;  /* 32px */
+  --iris-text-hero: 5rem;         /* 80px */
+
+  /* ── Spacing ── */
+  --iris-space-1: 1px;
+  --iris-space-2: 2px;
+  --iris-space-4: 4px;
+  --iris-space-6: 6px;
+  --iris-space-8: 8px;
+  --iris-space-10: 10px;
+  --iris-space-11: 11px;
+  --iris-space-14: 14px;
+  --iris-space-16: 16px;
+  --iris-space-24: 24px;
+  --iris-space-32: 32px;
+  --iris-space-40: 40px;
+  --iris-space-50: 50px;
+  --iris-space-64: 64px;
+  --iris-space-80: 80px;
+
+  /* ── Line Heights ── */
+  --iris-leading-tight: 1.10;  /* hero display */
+  --iris-leading-compact: 0.88; /* compact headers */
+  --iris-leading-base: 1.50;   /* standard — used everywhere */
+  --iris-leading-relaxed: 1.71; /* card titles */
+  --iris-leading-loose: 1.80;  /* captions */
+}
+
+/* ─── Dark Theme ─────────────────────────────────────────────────────────── */
+.dark {
+  color-scheme: dark;
+
+  /* ── Backgrounds ── */
+  --iris-bg: #0d1117;
+  --iris-bg-secondary: #161b22;
+  --iris-bg-glass: hsla(0, 0%, 8%, 0.4);
+  --iris-bg-dark: #0a0d12;
+
+  /* ── Text ── */
+  --iris-text-primary: #e2e8f0;
+  --iris-text-heading: #f1f5f9;
+  --iris-text-secondary: #94a3b8;
+  --iris-text-muted: #64748b;
+  --iris-text-helper: #8e8e93;
+
+  /* ── Borders ── */
+  --iris-border-light: #21262d;
+  --iris-border: #30363d;
+
+  /* ── Buttons ── */
+  --iris-btn-primary-bg: #3b82f6;
+  --iris-btn-primary-text: #ffffff;
+  --iris-btn-primary-hover: #2563eb;
+  --iris-btn-nav-bg: rgba(255, 255, 255, 0.1);
+  --iris-btn-nav-text: #e2e8f0;
+  --iris-btn-secondary-bg: #21262d;
+  --iris-btn-secondary-text: #e2e8f0;
+  --iris-btn-secondary-hover: #30363d;
+
+  /* ── Shadows (softer in dark) ── */
+  --iris-shadow-standard: rgba(0, 0, 0, 0.3) 0px 4px 6px;
+  --iris-shadow-soft: rgba(0, 0, 0, 0.3) 0px 0px 22.576px;
+  --iris-shadow-brand: rgba(44, 30, 116, 0.4) 0px 0px 15px;
+  --iris-shadow-brand-offset: rgba(44, 30, 116, 0.3) 6.5px 2px 17.5px;
+  --iris-shadow-elevated: rgba(0, 0, 0, 0.4) 0px 12px 16px -4px;
+}
+
+/* ─── Component Theme Classes ────────────────────────────────────────────── */
+
+/* Card styles */
+.iris-card {
+  background: var(--iris-bg);
+  border: 1px solid var(--iris-border);
+  border-radius: var(--iris-radius-md);
+  box-shadow: var(--iris-shadow-standard);
+}
+
+.iris-card-featured {
+  border-radius: var(--iris-radius-xl);
+  box-shadow: var(--iris-shadow-brand);
+}
+
+.iris-card-hero {
+  border-radius: var(--iris-radius-2xl);
+  box-shadow: var(--iris-shadow-brand-offset);
+}
+
+/* Button styles */
+.iris-btn-primary {
+  background: var(--iris-btn-primary-bg);
+  color: var(--iris-btn-primary-text);
+  border-radius: var(--iris-radius-sm);
+  padding: 11px 20px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: background-color 150ms ease;
+}
+
+.iris-btn-primary:hover {
+  background: var(--iris-btn-primary-hover);
+}
+
+.iris-btn-nav {
+  background: var(--iris-btn-nav-bg);
+  color: var(--iris-btn-nav-text);
+  border-radius: var(--iris-radius-full);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 150ms ease;
+}
+
+.iris-btn-secondary {
+  background: var(--iris-btn-secondary-bg);
+  color: var(--iris-btn-secondary-text);
+  border-radius: var(--iris-radius-sm);
+  padding: 11px 20px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  transition: background-color 150ms ease;
+}
+
+.iris-btn-secondary:hover {
+  background: var(--iris-btn-secondary-hover);
+}
+
+/* Typography helpers */
+.iris-hero {
+  font-family: "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--iris-text-hero);
+  font-weight: 500;
+  line-height: var(--iris-leading-tight);
+  color: var(--iris-text-heading);
+}
+
+.iris-section-heading {
+  font-family: "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--iris-text-section);
+  font-weight: 600;
+  line-height: var(--iris-leading-base);
+  color: var(--iris-text-heading);
+}
+
+.iris-card-title {
+  font-family: "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--iris-text-card);
+  font-weight: 500;
+  line-height: var(--iris-leading-relaxed);
+  color: var(--iris-text-heading);
+}
+
+.iris-sub-heading {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: var(--iris-leading-base);
+}
+
+.iris-body {
+  font-family: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--iris-text-base);
+  font-weight: 400;
+  line-height: var(--iris-leading-base);
+  color: var(--iris-text-primary);
+}
+
+.iris-nav-text {
+  font-family: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--iris-text-nav);
+  font-weight: 500;
+  line-height: var(--iris-leading-base);
+}
+
+.iris-caption {
+  font-family: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--iris-text-sm);
+  font-weight: 400;
+  line-height: var(--iris-leading-loose);
+  color: var(--iris-text-muted);
+}

@@ -1,0 +1,208 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+/* ─── Design System: Iris (inspired by MiniMax) ─────────────────────────── */
+
+@layer base {
+  :root {
+    /* ── Brand Colors ── */
+    --brand-blue: #1456f0;
+    --brand-blue-sky: #3daeff;
+    --brand-pink: #ea5ec1;
+
+    /* ── Blue Scale ── */
+    --color-primary-200: #bfdbfe;
+    --color-primary-light: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --brand-deep: #17437d;
+
+    /* ── Text Colors ── */
+    --color-text-primary: #222222;
+    --color-text-heading: #18181b;
+    --color-text-surface: #181e25;
+    --color-text-secondary: #45515e;
+    --color-text-muted: #8e8e93;
+    --color-text-helper: #5f5f5f;
+
+    /* ── Surface & Background ── */
+    --color-bg: #ffffff;
+    --color-bg-secondary: #f0f0f0;
+    --color-bg-glass: hsla(0, 0%, 100%, 0.4);
+    --color-border-light: #f2f3f5;
+    --color-border: #e5e7eb;
+    --color-bg-dark: #181e25;
+
+    /* ── Semantic ── */
+    --color-success-bg: #e8ffea;
+
+    /* ── Shadows ── */
+    --shadow-standard: rgba(0, 0, 0, 0.08) 0px 4px 6px;
+    --shadow-soft-glow: rgba(0, 0, 0, 0.08) 0px 0px 22.576px;
+    --shadow-brand-purple: rgba(44, 30, 116, 0.16) 0px 0px 15px;
+    --shadow-brand-purple-offset: rgba(44, 30, 116, 0.11) 6.5px 2px 17.5px;
+    --shadow-card-elevation: rgba(36, 36, 36, 0.08) 0px 12px 16px -4px;
+
+    /* ── Radius Scale ── */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-comfortable: 12px;
+    --radius-generous: 20px;
+    --radius-large: 24px;
+    --radius-pill: 30px;
+    --radius-full: 9999px;
+
+    /* ── shadcn/ui CSS variables (light mode) ── */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 84% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 20%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 84% 53%;
+    --radius: 0.5rem;
+
+    /* ── Sidebar ── */
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #f2f3f5;
+    --sidebar-width: 240px;
+    --sidebar-collapsed-width: 64px;
+  }
+
+  .dark {
+    /* ── shadcn/ui CSS variables (dark mode) ── */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 221 84% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 76% 48%;
+
+    /* ── Design tokens (dark mode overrides) ── */
+    --color-text-primary: #e2e8f0;
+    --color-text-heading: #f1f5f9;
+    --color-text-secondary: #94a3b8;
+    --color-text-muted: #64748b;
+    --color-bg: #0d1117;
+    --color-bg-secondary: #161b22;
+    --color-border-light: #21262d;
+    --color-border: #30363d;
+    --sidebar-bg: #0d1117;
+    --sidebar-border: #21262d;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--color-text-heading);
+  }
+
+  h1 {
+    font-size: 5rem; /* 80px */
+    font-weight: 500;
+    line-height: 1.10;
+  }
+
+  h2 {
+    font-size: 1.94rem; /* 31px */
+    line-height: 1.50;
+  }
+
+  h3 {
+    font-size: 1.75rem; /* 28px */
+    font-weight: 500;
+    line-height: 1.71;
+  }
+
+  h4 {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.5rem; /* 24px */
+    font-weight: 500;
+    line-height: 1.50;
+  }
+
+  h5 {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 500;
+    line-height: 1.50;
+  }
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────────── */
+@layer utilities {
+  .font-display {
+    font-family: "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  .font-ui {
+    font-family: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  .font-mid {
+    font-family: "Poppins", sans-serif;
+  }
+
+  .font-data {
+    font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  .shadow-brand {
+    box-shadow: var(--shadow-brand-purple);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-standard);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-card-elevation);
+  }
+}

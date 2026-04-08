@@ -1,7 +1,7 @@
 ---
 id: project-setup
 title: Project Setup & Configuration
-status: ready
+status: in-progress
 milestone: foundation
 priority: high
 handoff: single
@@ -24,20 +24,20 @@ There is a design file at docs/design.md that specifies how the gui should look.
 
 ## Acceptance Criteria
 
-- [ ] `bun run dev` starts both frontend (Vite) and backend (Hono)
-- [ ] Frontend loads with design system applied (fonts, colors, light/dark toggle)
-- [ ] Database connection established via Drizzle
-- [ ] Health check endpoint responds at `/api/health`
-- [ ] Docker Compose brings up Postgres
+- [x] `bun run dev` starts both frontend (Vite) and backend (Hono)
+- [x] Frontend loads with design system applied (fonts, colors, light/dark toggle)
+- [x] Database connection established via Drizzle
+- [x] Health check endpoint responds at `/api/health`
+- [x] Docker Compose brings up Postgres
 
 ## Tasks
 
-- [ ] Initialize Vite + React 19 + TypeScript project | frontend
-- [ ] Configure Tailwind with design system tokens from Design.md | frontend
-- [ ] Set up shadcn/ui with custom theme | frontend
-- [ ] Add light/dark mode toggle | frontend
-- [ ] Set up Hono server with static file serving | backend
-- [ ] Configure Drizzle ORM with PostgreSQL | backend
-- [ ] Create Docker Compose for Postgres | infrastructure
-- [ ] Create app shell with sidebar navigation | frontend
-- [ ] Implement themes based on the design-spec in /docs
+- [x] Initialize Vite + React 19 + TypeScript project | frontend
+- [x] Configure Tailwind with design system tokens from Design.md | frontend
+- [x] Set up shadcn/ui with custom theme | frontend
+- [x] Add light/dark mode toggle | frontend
+- [x] Set up Hono server with static file serving | backend
+- [x] Configure Drizzle ORM with PostgreSQL | backend
+- [x] Create Docker Compose for Postgres | infrastructure
+- [x] Create app shell with sidebar navigation | frontend
+- [x] Implement themes based on the design-spec in /docs

@@ -1,0 +1,28 @@
+{
+  "name": "iris",
+  "version": "0.1.0",
+  "description": "Self-hosted image search and organizer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"bun run dev:frontend\" \"bun run dev:backend\"",
+    "dev:frontend": "cd src/frontend && bun run dev",
+    "dev:backend": "bun run --watch src/backend/index.ts",
+    "build": "cd src/frontend && bun run build",
+    "preview": "bun run src/backend/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run src/backend/db/migrate.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "drizzle-orm": "^0.41.0",
+    "hono": "^4.7.7",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "concurrently": "^9.1.2",
+    "drizzle-kit": "^0.30.6"
+  }
+}
