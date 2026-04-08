@@ -1,7 +1,7 @@
 ---
 id: metadata-extraction
 title: Image Metadata Extraction & Indexing
-status: in-progress
+status: complete
 milestone: foundation
 priority: high
 handoff: single
