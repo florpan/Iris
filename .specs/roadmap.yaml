@@ -2,7 +2,7 @@ milestones:
   - id: foundation
     title: Foundation
     target: MVP
-    status: in-progress
+    status: complete
     description: Core infrastructure — project setup, database, source management,
       metadata extraction, thumbnail generation
   - id: browsing
