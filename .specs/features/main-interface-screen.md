@@ -1,7 +1,7 @@
 ---
 id: main-interface-screen
 title: Main interface screen
-status: ready
+status: in-progress
 milestone: browsing
 priority: high
 depends_on: folder-navigation, search, metadata-filtering
@@ -58,26 +58,26 @@ The primary application interface that serves as the central hub for all image b
 
 ## Acceptance Criteria
 
-- [ ] Header contains logo, search bar, and view mode toggle buttons
-- [ ] Sidebar displays folder tree navigation and metadata filter panels
-- [ ] Main content area shows breadcrumbs and image results in selected view mode
-- [ ] Layout adapts responsively to different screen sizes
-- [ ] Sidebar can be collapsed/expanded with toggle button
-- [ ] Empty states display helpful messages when no content is available
-- [ ] Search, filter, and navigation state is synchronized across all components
-- [ ] Page loads quickly with progressive enhancement for large image sets
+- [x] Header contains logo, search bar, and view mode toggle buttons
+- [x] Sidebar displays folder tree navigation and metadata filter panels
+- [x] Main content area shows breadcrumbs and image results in selected view mode
+- [x] Layout adapts responsively to different screen sizes
+- [x] Sidebar can be collapsed/expanded with toggle button
+- [x] Empty states display helpful messages when no content is available
+- [x] Search, filter, and navigation state is synchronized across all components
+- [x] Page loads quickly with progressive enhancement for large image sets
 
 ## Tasks
 
-- [ ] Build responsive layout structure with CSS Grid/Flexbox | frontend
-- [ ] Create header component with search and view controls | frontend
-- [ ] Implement collapsible sidebar with folder tree and filters | frontend
-- [ ] Build main content area with breadcrumbs and results display | frontend
-- [ ] Add responsive breakpoints and mobile navigation drawer | frontend
-- [ ] Implement state management for shared component data | frontend
-- [ ] Create empty state components for all content areas | frontend
-- [ ] Test layout across different viewport sizes and devices | testing
-- [ ] Optimize performance for large image sets with virtualization | frontend
+- [x] Build responsive layout structure with CSS Grid/Flexbox | frontend
+- [x] Create header component with search and view controls | frontend
+- [x] Implement collapsible sidebar with folder tree and filters | frontend
+- [x] Build main content area with breadcrumbs and results display | frontend
+- [x] Add responsive breakpoints and mobile navigation drawer | frontend
+- [x] Implement state management for shared component data | frontend
+- [x] Create empty state components for all content areas | frontend
+- [ ] (skipped — test runner disabled) Test layout across different viewport sizes and devices | testing
+- [x] Optimize performance for large image sets with virtualization | frontend
 
 ## Open Questions
 

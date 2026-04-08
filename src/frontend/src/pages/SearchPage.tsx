@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { SearchBar } from "@/components/SearchBar";
 import { SearchFilterPanel, type SearchFilters } from "@/components/SearchFilters";
 import { ImageDetailModal } from "@/components/ImageDetailModal";
+import { EmptyState } from "@/components/EmptyState";
 import type { GridDensity } from "@/components/ImageGrid";
 import {
   buildImageDetailUrl,
@@ -562,27 +563,17 @@ export function SearchPage() {
       {/* ── Content area ────────────────────────────────────────────────────── */}
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
         {!hasSearched ? (
-          // Empty state — no search yet
-          <div className="flex flex-col items-center justify-center h-64 text-[var(--color-text-muted)]">
-            <Search className="w-10 h-10 mb-3 opacity-30" />
-            <p className="text-sm font-medium text-[var(--color-text-secondary)]">
-              Search your photo library
-            </p>
-            <p className="text-xs mt-1 text-[var(--color-text-muted)]">
-              Search by filename, title, description, keywords, camera model, and more
-            </p>
-          </div>
+          <EmptyState.SearchPrompt />
         ) : error ? (
           <div className="flex items-center gap-2 p-6 text-sm text-red-500">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         ) : images.length === 0 && !loading ? (
-          <div className="flex flex-col items-center justify-center h-48 text-[var(--color-text-muted)]">
-            <ImageOff className="w-8 h-8 mb-2 opacity-30" />
-            <p className="text-sm">No images found</p>
-            <p className="text-xs mt-1">Try different keywords or adjust your filters</p>
-          </div>
+          <EmptyState.NoSearchResults
+            query={submittedQuery}
+            onClear={() => handleSearch("")}
+          />
         ) : (
           <div className={cn("grid p-4", DENSITY_CONFIG[density].gridClass)}>
             {loading

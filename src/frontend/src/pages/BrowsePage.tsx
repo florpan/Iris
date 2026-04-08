@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { FacetPanel, type FacetFilters, type FacetData } from "@/components/FacetPanel";
 import { StatsDashboard } from "@/components/StatsDashboard";
 import { ImageDetailModal } from "@/components/ImageDetailModal";
+import { EmptyState } from "@/components/EmptyState";
 import type { GridDensity } from "@/components/ImageGrid";
 import {
   buildImageDetailUrl,
@@ -509,15 +510,18 @@ export function BrowsePage() {
               {imagesError}
             </div>
           ) : imageList.length === 0 && !imagesLoading ? (
-            <div className="flex flex-col items-center justify-center h-64 text-[var(--color-text-muted)]">
-              <ImageOff className="w-10 h-10 mb-3 opacity-30" />
-              <p className="text-sm font-medium text-[var(--color-text-secondary)]">
-                No images found
-              </p>
-              {activeFilterCount > 0 && (
-                <p className="text-xs mt-1">Try adjusting or clearing your filters</p>
-              )}
-            </div>
+            activeFilterCount > 0 ? (
+              <EmptyState.NoFilterResults
+                onClear={() => setFilters({
+                  camera: '', lens: '', format: '',
+                  dateFrom: '', dateTo: '',
+                  focalLengthMin: '', focalLengthMax: '',
+                  isoMin: '', isoMax: '',
+                })}
+              />
+            ) : (
+              <EmptyState.NoImages />
+            )
           ) : (
             <div className={cn("grid p-4", DENSITY_CONFIG[density].gridClass)}>
               {imagesLoading

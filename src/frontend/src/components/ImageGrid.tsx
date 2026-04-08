@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SelectedFolder } from "./FolderTree";
+import { EmptyState } from "./EmptyState";
 import { ImageDetailModal } from "./ImageDetailModal";
 import {
   buildImageDetailUrl,
@@ -124,11 +125,35 @@ interface ThumbnailProps {
 
 function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: ThumbnailProps) {
   const [imgError, setImgError] = useState(false);
+  const [hasBeenVisible, setHasBeenVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Programmatic focus (keyboard navigation)
   useEffect(() => {
     if (isFocused) ref.current?.focus();
   }, [isFocused]);
+
+  // Intersection Observer: defer image src until near viewport
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || hasBeenVisible) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setHasBeenVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasBeenVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const showLabel = density === "large" || density === "medium";
 
@@ -147,8 +172,8 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: T
       onKeyDown={onKeyDown}
       onClick={onClick}
     >
-      {/* Thumbnail image */}
-      {image.thumbnailPath && !imgError ? (
+      {/* Thumbnail image — only load src once near viewport */}
+      {hasBeenVisible && image.thumbnailPath && !imgError ? (
         <img
           src={`/api/images/${image.id}/thumb`}
           alt={image.fileName}
@@ -159,7 +184,9 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: T
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <ImageOff className="w-6 h-6 text-[var(--color-text-muted)]" />
+          {(imgError || !image.thumbnailPath) && hasBeenVisible && (
+            <ImageOff className="w-6 h-6 text-[var(--color-text-muted)]" />
+          )}
         </div>
       )}
 
@@ -363,10 +390,11 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
 
   if (!selected) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-[var(--color-text-muted)]">
-        <LayoutGrid className="w-10 h-10 mb-3 opacity-30" />
-        <p className="text-sm">Select a folder to browse images</p>
-      </div>
+      <EmptyState
+        icon={LayoutGrid}
+        title="Select a folder to browse images"
+        description="Use the folder tree on the left to navigate your photo library"
+      />
     );
   }
 
@@ -452,10 +480,7 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
             <span>{error}</span>
           </div>
         ) : images.length === 0 && !loading ? (
-          <div className="flex flex-col items-center justify-center h-48 text-[var(--color-text-muted)]">
-            <ImageOff className="w-8 h-8 mb-2 opacity-30" />
-            <p className="text-sm">No images in this folder</p>
-          </div>
+          <EmptyState.NoFolderContents folderName={selected.path.split("/").pop()} />
         ) : (
           <div className={cn("grid p-4", DENSITY_CONFIG[density].gridClass)}>
             {loading
