@@ -2,6 +2,7 @@ import { type ReactNode, useEffect } from "react";
 import { AppShell } from "./components/AppShell";
 import { LibraryPage } from "./pages/LibraryPage";
 import { FolderPage } from "./pages/FolderPage";
+import { SearchPage } from "./pages/SearchPage";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
@@ -30,6 +31,8 @@ function App() {
   let page: ReactNode;
   if (path === "/folders" || path.startsWith("/folders/")) {
     page = <FolderPage />;
+  } else if (path === "/search") {
+    page = <SearchPage />;
   } else {
     page = <LibraryPage />;
   }

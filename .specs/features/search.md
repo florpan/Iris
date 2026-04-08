@@ -1,7 +1,7 @@
 ---
 id: search
 title: Search — Metadata & Filename
-status: ready
+status: in-progress
 milestone: browsing
 priority: high
 handoff: single
@@ -36,20 +36,20 @@ PostgreSQL full-text search with GIN indexes on searchable text fields. For larg
 
 ## Acceptance Criteria
 
-- [ ] Text search finds images by filename
-- [ ] Text search finds images by IPTC title, description, keywords
-- [ ] Camera model filter works
-- [ ] Date range filter works
-- [ ] Filters combine with text search
-- [ ] Results display in thumbnail grid with count
-- [ ] Results sortable by relevance, date, name
-- [ ] Search performs well with 10k+ indexed images
+- [x] Text search finds images by filename
+- [x] Text search finds images by IPTC title, description, keywords
+- [x] Camera model filter works
+- [x] Date range filter works
+- [x] Filters combine with text search
+- [x] Results display in thumbnail grid with count
+- [x] Results sortable by relevance, date, name
+- [x] Search performs well with 10k+ indexed images
 
 ## Tasks
 
-- [ ] Add full-text search indexes to database schema | backend, database
-- [ ] Create search API endpoint with text + structured filters | backend, api
-- [ ] Build search bar component (always visible) | frontend
-- [ ] Build advanced filter panel (camera, lens, date, format, size) | frontend
-- [ ] Connect search results to thumbnail grid component | frontend
-- [ ] Add search suggestions for camera/lens values | backend, api
+- [x] Add full-text search indexes to database schema | backend, database
+- [x] Create search API endpoint with text + structured filters | backend, api
+- [x] Build search bar component (always visible) | frontend
+- [x] Build advanced filter panel (camera, lens, date, format, size) | frontend
+- [x] Connect search results to thumbnail grid component | frontend
+- [x] Add search suggestions for camera/lens values | backend, api

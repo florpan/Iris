@@ -9,6 +9,7 @@ import { tagsRouter } from "./tags";
 import { syncRouter } from "./sync";
 import { statsRouter } from "./stats";
 import { thumbnailsRouter } from "./thumbnails";
+import { searchRouter } from "./search";
 
 export const apiRouter = new Hono();
 
@@ -25,3 +26,4 @@ apiRouter.route("/tags", tagsRouter);
 apiRouter.route("/sync", syncRouter);
 apiRouter.route("/stats", statsRouter);
 apiRouter.route("/thumbnails", thumbnailsRouter);
+apiRouter.route("/search", searchRouter);

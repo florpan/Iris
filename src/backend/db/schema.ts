@@ -70,6 +70,10 @@ export const images = pgTable(
     index("images_source_folder_idx").on(table.sourceFolderId),
     index("images_taken_at_idx").on(table.takenAt),
     index("images_relative_path_idx").on(table.relativePath),
+    // Search indexes — GIN index defined in migration 0002_search_indexes.sql
+    index("images_camera_model_idx").on(table.cameraModel),
+    index("images_lens_model_idx").on(table.lensModel),
+    index("images_mime_type_idx").on(table.mimeType),
   ]
 );
 
