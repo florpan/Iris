@@ -8,7 +8,7 @@ milestones:
   - id: browsing
     title: Browsing & Display
     target: MVP
-    status: planned
+    status: in-progress
     description: Frontend views — folder navigation, image grid, detail view, search
   - id: views
     title: Advanced Views
