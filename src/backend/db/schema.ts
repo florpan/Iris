@@ -9,6 +9,7 @@ import {
   real,
   jsonb,
   index,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 // ── Source Folders ──────────────────────────────────────────────────────────
@@ -82,6 +83,7 @@ export const tags = pgTable("tags", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
   color: text("color"),
+  usageCount: integer("usage_count").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -94,8 +96,10 @@ export const imageTags = pgTable(
     tagId: integer("tag_id")
       .notNull()
       .references(() => tags.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => [
+    primaryKey({ columns: [table.imageId, table.tagId] }),
     index("image_tags_image_idx").on(table.imageId),
     index("image_tags_tag_idx").on(table.tagId),
   ]
@@ -159,3 +163,6 @@ export type SourceFolder = typeof sourceFolders.$inferSelect;
 export type SyncRun = typeof syncRuns.$inferSelect;
 export type NewSyncRun = typeof syncRuns.$inferInsert;
 export type SourceSyncStatus = typeof sourceSyncStatus.$inferSelect;
+export type Tag = typeof tags.$inferSelect;
+export type NewTag = typeof tags.$inferInsert;
+export type ImageTag = typeof imageTags.$inferSelect;

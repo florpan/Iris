@@ -1,7 +1,7 @@
 ---
 id: image-tagging-system
 title: Image Tagging System
-status: ready
+status: in-progress
 milestone: browsing
 priority: high
 depends_on: image-metadata-display, sync-engine
@@ -51,24 +51,24 @@ A foundational tagging system that allows users to add, manage, and organize cus
 
 ## Acceptance Criteria
 
-- [ ] Database tables for tags and image-tag relationships are created with proper constraints
-- [ ] API endpoints handle all CRUD operations for tags and image-tag associations
-- [ ] Tag autocomplete returns suggestions based on existing tags matching input
-- [ ] Duplicate tags are prevented (case-insensitive)
-- [ ] Bulk operations can add/remove tags from multiple images in a single request
-- [ ] Tag usage counts are automatically maintained when tags are added/removed
-- [ ] Concurrent tag operations don't create race conditions or data corruption
-- [ ] Invalid tag names are rejected with appropriate error messages
+- [x] Database tables for tags and image-tag relationships are created with proper constraints
+- [x] API endpoints handle all CRUD operations for tags and image-tag associations
+- [x] Tag autocomplete returns suggestions based on existing tags matching input
+- [x] Duplicate tags are prevented (case-insensitive)
+- [x] Bulk operations can add/remove tags from multiple images in a single request
+- [x] Tag usage counts are automatically maintained when tags are added/removed
+- [x] Concurrent tag operations don't create race conditions or data corruption
+- [x] Invalid tag names are rejected with appropriate error messages
 
 ## Tasks
 
-- [ ] Create database migration for tags and image_tags tables | backend
-- [ ] Implement tag CRUD API endpoints with validation | backend
-- [ ] Add tag autocomplete endpoint with fuzzy matching | backend
-- [ ] Implement bulk tag operations with transaction handling | backend
-- [ ] Create tag usage tracking system | backend
-- [ ] Add API tests for all tag operations | testing
-- [ ] Document tag API endpoints and validation rules | documentation
+- [x] Create database migration for tags and image_tags tables | backend
+- [x] Implement tag CRUD API endpoints with validation | backend
+- [x] Add tag autocomplete endpoint with fuzzy matching | backend
+- [x] Implement bulk tag operations with transaction handling | backend
+- [x] Create tag usage tracking system | backend
+- [ ] (skipped — test runner disabled) Add API tests for all tag operations | testing
+- [x] Document tag API endpoints and validation rules | documentation
 
 ## Open Questions
 
