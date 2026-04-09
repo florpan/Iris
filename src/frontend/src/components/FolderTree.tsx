@@ -246,7 +246,6 @@ function SourceRow({ source, selected, onSelect }: SourceRowProps) {
         {!source.enabled && (
           <AlertCircle
             className="w-3.5 h-3.5 text-amber-500 shrink-0"
-            title="Source unavailable"
           />
         )}
 

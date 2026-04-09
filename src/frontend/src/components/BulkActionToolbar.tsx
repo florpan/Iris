@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Tag, TagsIcon, X, Loader2, CheckCircle, AlertCircle, Plus, Minus } from "lucide-react";
+import { TagsIcon, X, Loader2, CheckCircle, AlertCircle, Plus, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────

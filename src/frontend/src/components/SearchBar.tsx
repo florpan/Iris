@@ -77,10 +77,6 @@ export function SearchBar({
     inputRef.current?.focus();
   }, [value, onChange, onSearch]);
 
-  const handleSubmit = useCallback(() => {
-    onSearch?.(currentValue);
-  }, [currentValue, onSearch]);
-
   return (
     <div
       className={cn(

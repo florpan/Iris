@@ -118,47 +118,6 @@ function formatDateSource(ds: "exif" | "file" | "mixed"): string {
   return "Mixed (EXIF + file dates)";
 }
 
-// ── Thumbnail component ───────────────────────────────────────────────────────
-
-interface ThumbProps {
-  image: ImageItem;
-  size?: "sm" | "md";
-  onClick: () => void;
-}
-
-function Thumb({ image, size = "md", onClick }: ThumbProps) {
-  const [err, setErr] = useState(false);
-  const sizeClass = size === "sm" ? "w-10 h-10" : "w-16 h-16 sm:w-20 sm:h-20";
-
-  return (
-    <button
-      onClick={onClick}
-      title={image.fileName}
-      className={cn(
-        "relative rounded overflow-hidden bg-[var(--color-bg-secondary)] dark:bg-[var(--color-border)] shrink-0",
-        "focus:outline-none focus:ring-2 focus:ring-[#1456f0] focus:ring-offset-1 cursor-pointer",
-        "hover:opacity-90 transition-opacity",
-        sizeClass
-      )}
-    >
-      {image.thumbnailPath && !err ? (
-        <img
-          src={`/api/images/${image.id}/thumb`}
-          alt={image.fileName}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          decoding="async"
-          onError={() => setErr(true)}
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <ImageOff className="w-4 h-4 text-[var(--color-text-muted)]" />
-        </div>
-      )}
-    </button>
-  );
-}
-
 // ── DayGrid — full image grid for day-level groups ────────────────────────────
 
 interface DayGridProps {

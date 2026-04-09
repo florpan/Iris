@@ -72,12 +72,6 @@ interface ImageGridProps {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function formatFileSize(bytes: number | null): string {
-  if (bytes == null) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return "";
@@ -422,7 +416,7 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
 
   // Handle thumbnail click — supports normal click, shift+click for range
   const handleThumbnailClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>, image: ImageItem, index: number) => {
+    (e: React.MouseEvent<HTMLDivElement>, image: ImageItem, _index: number) => {
       if (hasSelection) {
         // In selection mode: toggle selection
         if (e.shiftKey && lastClickedIdRef.current !== null) {
