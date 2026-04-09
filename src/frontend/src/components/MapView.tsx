@@ -170,12 +170,11 @@ export function MapView(props: MapViewProps) {
     let destroyed = false;
 
     const init = async () => {
-      const [L, LMC] = await Promise.all([
-        import("leaflet"),
-        import("leaflet.markercluster"),
-      ]);
-      // LMC is a side-effect import that extends L globally
-      void LMC;
+      const leafletModule = await import("leaflet");
+      const L = leafletModule.default ?? leafletModule;
+      // markercluster extends L globally — needs a mutable L on window
+      (window as any).L = L;
+      await import("leaflet.markercluster");
 
       if (destroyed || !mapContainerRef.current) return;
 

@@ -5,10 +5,11 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { db } from "../db/client";
 import { images } from "../db/schema";
+import { loadConfig } from "../lib/config";
 
 export const thumbsRouter = new Hono();
 
-const WORK_DIR = process.env.WORK_DIR ?? "./work";
+const WORK_DIR = loadConfig().workFolder;
 
 // Cache for 7 days — thumbnails are immutable once generated
 const THUMB_CACHE_CONTROL = "public, max-age=604800, immutable";

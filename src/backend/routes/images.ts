@@ -6,6 +6,7 @@ import * as path from "node:path";
 import { db } from "../db/client";
 import { images, sourceFolders } from "../db/schema";
 import { parsePagination, paginatedResponse } from "../lib/pagination";
+import { loadConfig } from "../lib/config";
 
 export const imagesRouter = new Hono();
 
@@ -353,7 +354,7 @@ imagesRouter.get("/:id/thumb", async (c) => {
     });
   }
 
-  const workDir = process.env.WORK_DIR ?? "./work";
+  const workDir = loadConfig().workFolder;
   const absoluteThumbPath = path.isAbsolute(image.thumbnailPath)
     ? image.thumbnailPath
     : path.join(workDir, image.thumbnailPath);
