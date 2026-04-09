@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { and, eq, gte, lte, sql, desc, asc, ilike, type SQL } from "drizzle-orm";
+import { and, eq, gte, lte, sql, desc, asc, ilike, inArray, type SQL } from "drizzle-orm";
 import { db } from "../db/client";
-import { images } from "../db/schema";
+import { images, tags, imageTags } from "../db/schema";
 import { parsePagination, paginatedResponse } from "../lib/pagination";
 
 export const searchRouter = new Hono();
@@ -67,6 +67,8 @@ const searchVector = sql<string>`(
  *   order      — asc | desc (default: desc)
  *   page       — page number (default: 1)
  *   pageSize   — items per page (default: 50, max: 200)
+ *   tags       — comma-separated tag names to filter by
+ *   tagLogic   — "and" (default) | "or" — how multiple tags are combined
  */
 searchRouter.get("/", async (c) => {
   const q = c.req.query("q")?.trim() ?? "";
@@ -85,6 +87,13 @@ searchRouter.get("/", async (c) => {
   const focalLengthMax = c.req.query("focalLengthMax");
   const isoMin = c.req.query("isoMin");
   const isoMax = c.req.query("isoMax");
+  const tagsParam = c.req.query("tags")?.trim() ?? "";
+  const tagLogicParam = c.req.query("tagLogic")?.trim() ?? "and";
+  const tagLogic: "and" | "or" = tagLogicParam === "or" ? "or" : "and";
+  const tagNames = tagsParam
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
 
   const defaultSort: SortField = q ? "relevance" : "date";
   const sortRaw = (c.req.query("sort") ?? defaultSort) as SortField;
@@ -99,7 +108,7 @@ searchRouter.get("/", async (c) => {
   // Require at least one search parameter
   if (!q && !camera && !lens && !dateFrom && !dateTo && !format &&
     !minWidth && !maxWidth && !minHeight && !maxHeight && !minSize && !maxSize &&
-    !focalLengthMin && !focalLengthMax && !isoMin && !isoMax) {
+    !focalLengthMin && !focalLengthMax && !isoMin && !isoMax && tagNames.length === 0) {
     throw new HTTPException(400, { message: "At least one search parameter is required" });
   }
 
@@ -199,6 +208,44 @@ searchRouter.get("/", async (c) => {
   if (isoMax) {
     const v = Number(isoMax);
     if (Number.isFinite(v)) conditions.push(sql`${images.iso} < ${v}`);
+  }
+
+  // Tag filters
+  if (tagNames.length > 0) {
+    // Resolve tag names to IDs first
+    const resolvedTagRows = await db
+      .select({ id: tags.id, name: tags.name })
+      .from(tags)
+      .where(inArray(tags.name, tagNames));
+
+    const resolvedTagIds = resolvedTagRows.map((r) => r.id);
+
+    if (resolvedTagIds.length > 0) {
+      if (tagLogic === "or") {
+        // OR: image must have at least ONE of the selected tags
+        conditions.push(
+          sql`EXISTS (
+            SELECT 1 FROM image_tags
+            WHERE image_tags.image_id = ${images.id}
+              AND image_tags.tag_id = ANY(ARRAY[${sql.join(resolvedTagIds.map((id) => sql`${id}`), sql`, `)}])
+          )`
+        );
+      } else {
+        // AND: image must have ALL selected tags (one EXISTS subquery per tag)
+        for (const tagId of resolvedTagIds) {
+          conditions.push(
+            sql`EXISTS (
+              SELECT 1 FROM image_tags
+              WHERE image_tags.image_id = ${images.id}
+                AND image_tags.tag_id = ${tagId}
+            )`
+          );
+        }
+      }
+    } else {
+      // None of the tag names exist — return no results
+      conditions.push(sql`FALSE`);
+    }
   }
 
   const whereClause = and(...conditions);

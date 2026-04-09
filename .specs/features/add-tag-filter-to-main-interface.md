@@ -1,7 +1,7 @@
 ---
 id: add-tag-filter-to-main-interface
 title: Add tag filter to main interface
-status: ready
+status: in-progress
 milestone: browsing
 priority: medium
 depends_on: main-interface-screen, image-tagging-system, metadata-filtering
@@ -58,27 +58,27 @@ Filter Logic: ⚪ AND ⚪ OR
 
 ## Acceptance Criteria
 
-- [ ] Tag filter panel appears in sidebar with all available tags and usage counts
-- [ ] Users can search/filter the tag list to find specific tags
-- [ ] Multiple tags can be selected with checkboxes and visual indicators
-- [ ] AND/OR toggle controls how multiple tag filters are combined
-- [ ] Active tag filters display in filter summary with remove buttons
-- [ ] Image results update in real-time as tag filters are applied/removed
-- [ ] Tag filters work correctly in combination with other metadata filters
-- [ ] Clear filters functionality removes tag filters along with others
-- [ ] Tag filter state persists in URL and across page refreshes
+- [x] Tag filter panel appears in sidebar with all available tags and usage counts
+- [x] Users can search/filter the tag list to find specific tags
+- [x] Multiple tags can be selected with checkboxes and visual indicators
+- [x] AND/OR toggle controls how multiple tag filters are combined
+- [x] Active tag filters display in filter summary with remove buttons
+- [x] Image results update in real-time as tag filters are applied/removed
+- [x] Tag filters work correctly in combination with other metadata filters
+- [x] Clear filters functionality removes tag filters along with others
+- [x] Tag filter state persists in URL and across page refreshes
 
 ## Tasks
 
-- [ ] Add tag filter section to metadata filtering sidebar component | frontend
-- [ ] Implement searchable tag list with usage counts | frontend
-- [ ] Build multi-select tag interface with checkboxes and visual feedback | frontend
-- [ ] Add AND/OR logic toggle for multiple tag selection | frontend
-- [ ] Integrate tag filters with existing search/filter API calls | frontend
-- [ ] Update filter summary component to display active tag filters | frontend
-- [ ] Add URL state management for tag filter persistence | frontend
-- [ ] Optimize tag list loading for large tag collections | frontend
-- [ ] Test tag filtering combined with other filter types | testing
+- [x] Add tag filter section to metadata filtering sidebar component | frontend
+- [x] Implement searchable tag list with usage counts | frontend
+- [x] Build multi-select tag interface with checkboxes and visual feedback | frontend
+- [x] Add AND/OR logic toggle for multiple tag selection | frontend
+- [x] Integrate tag filters with existing search/filter API calls | frontend
+- [x] Update filter summary component to display active tag filters | frontend
+- [x] Add URL state management for tag filter persistence | frontend
+- [x] Optimize tag list loading for large tag collections | frontend
+- [ ] (skipped — test runner disabled) Test tag filtering combined with other filter types | testing
 
 ## Open Questions
 

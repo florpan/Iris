@@ -74,6 +74,7 @@ const DENSITY_CONFIG: Record<GridDensity, { gridClass: string; thumbClass: strin
 
 function parseUrlState(): { filters: FacetFilters; page: number } {
   const p = new URLSearchParams(window.location.search);
+  const tagLogicRaw = p.get("tagLogic") ?? "and";
   return {
     filters: {
       camera: p.get("camera") ?? "",
@@ -85,6 +86,8 @@ function parseUrlState(): { filters: FacetFilters; page: number } {
       focalLengthMax: p.get("focalLengthMax") ?? "",
       isoMin: p.get("isoMin") ?? "",
       isoMax: p.get("isoMax") ?? "",
+      tags: p.get("tags") ?? "",
+      tagLogic: tagLogicRaw === "or" ? "or" : "and",
     },
     page: Math.max(1, Number(p.get("page") ?? "1") || 1),
   };
@@ -101,6 +104,8 @@ function buildQueryString(filters: FacetFilters, page: number): URLSearchParams 
   if (filters.focalLengthMax) p.set("focalLengthMax", filters.focalLengthMax);
   if (filters.isoMin) p.set("isoMin", filters.isoMin);
   if (filters.isoMax) p.set("isoMax", filters.isoMax);
+  if (filters.tags) p.set("tags", filters.tags);
+  if (filters.tags && filters.tagLogic === "or") p.set("tagLogic", "or");
   if (page > 1) p.set("page", String(page));
   return p;
 }
@@ -110,7 +115,8 @@ function hasAnyFilter(filters: FacetFilters): boolean {
     filters.camera || filters.lens || filters.format ||
     filters.dateFrom || filters.dateTo ||
     filters.focalLengthMin || filters.focalLengthMax ||
-    filters.isoMin || filters.isoMax
+    filters.isoMin || filters.isoMax ||
+    filters.tags
   );
 }
 
@@ -228,7 +234,7 @@ export function BrowsePage() {
   const loadFacets = useCallback((f: FacetFilters) => {
     setFacetsLoading(true);
     const qs = buildQueryString(f, 1);
-    // Remove page from facets query
+    // Remove page from facets query (not needed for facet counts)
     qs.delete("page");
     fetch(`/api/facets?${qs}`)
       .then((r) => {
@@ -276,6 +282,7 @@ export function BrowsePage() {
     qs.set("pageSize", String(PAGE_SIZE));
     qs.set("sort", "date");
     qs.set("order", "desc");
+    // tags and tagLogic are already included by buildQueryString
 
     fetch(`/api/search?${qs}`)
       .then((r) => {
@@ -348,6 +355,8 @@ export function BrowsePage() {
       if (filters.focalLengthMax) contextParams.set("focalLengthMax", filters.focalLengthMax);
       if (filters.isoMin) contextParams.set("isoMin", filters.isoMin);
       if (filters.isoMax) contextParams.set("isoMax", filters.isoMax);
+      if (filters.tags) contextParams.set("tags", filters.tags);
+      if (filters.tags && filters.tagLogic === "or") contextParams.set("tagLogic", "or");
       if (page > 1) contextParams.set("page", String(page));
 
       const detailUrl = buildImageDetailUrl(imageId, "browse", contextParams);
@@ -418,6 +427,7 @@ export function BrowsePage() {
     filters.dateFrom || filters.dateTo,
     filters.focalLengthMin || filters.focalLengthMax,
     filters.isoMin || filters.isoMax,
+    filters.tags,
   ].filter(Boolean).length;
 
   return (
@@ -554,6 +564,7 @@ export function BrowsePage() {
                   dateFrom: '', dateTo: '',
                   focalLengthMin: '', focalLengthMax: '',
                   isoMin: '', isoMax: '',
+                  tags: '', tagLogic: 'and',
                 })}
               />
             ) : (
