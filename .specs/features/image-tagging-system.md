@@ -1,7 +1,7 @@
 ---
 id: image-tagging-system
 title: Image Tagging System
-status: in-progress
+status: complete
 milestone: browsing
 priority: high
 depends_on: image-metadata-display, sync-engine
