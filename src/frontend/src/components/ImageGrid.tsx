@@ -7,6 +7,8 @@
  *  - Sort by name, date, size, or format
  *  - Pagination for large folders (never loads all at once)
  *  - Keyboard navigation (arrow keys, enter)
+ *  - Bulk selection with checkbox overlays
+ *  - Bulk tag add/remove operations
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -20,6 +22,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ImageOff,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SelectedFolder } from "./FolderTree";
@@ -32,6 +36,8 @@ import {
   saveFolderState,
   type ReturnContext,
 } from "@/hooks/useNavigationContext";
+import { useBulkSelection } from "@/hooks/useBulkSelection";
+import { BulkActionToolbar } from "./BulkActionToolbar";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -118,12 +124,23 @@ interface ThumbnailProps {
   image: ImageItem;
   density: GridDensity;
   isFocused: boolean;
+  isSelected: boolean;
   onFocus: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onCheckboxClick: (e: React.MouseEvent) => void;
 }
 
-function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: ThumbnailProps) {
+function Thumbnail({
+  image,
+  density,
+  isFocused,
+  isSelected,
+  onFocus,
+  onKeyDown,
+  onClick,
+  onCheckboxClick,
+}: ThumbnailProps) {
   const [imgError, setImgError] = useState(false);
   const [hasBeenVisible, setHasBeenVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -163,9 +180,11 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: T
       tabIndex={0}
       role="button"
       aria-label={image.fileName}
+      aria-pressed={isSelected}
       className={cn(
         "group relative rounded-[var(--radius-comfortable)] overflow-hidden bg-[var(--color-bg-secondary)] dark:bg-[var(--color-border)] cursor-pointer",
         "focus:outline-none focus:ring-2 focus:ring-[#1456f0] focus:ring-offset-1",
+        isSelected && "ring-2 ring-[#1456f0] ring-offset-1",
         DENSITY_CONFIG[density].thumbClass
       )}
       onFocus={onFocus}
@@ -188,6 +207,33 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: T
             <ImageOff className="w-6 h-6 text-[var(--color-text-muted)]" />
           )}
         </div>
+      )}
+
+      {/* Selection checkbox overlay */}
+      <button
+        className={cn(
+          "absolute top-1 left-1 z-10 rounded transition-all duration-150",
+          "focus:outline-none focus:ring-1 focus:ring-white",
+          // Always show if selected, show on hover otherwise
+          isSelected
+            ? "opacity-100"
+            : "opacity-0 group-hover:opacity-100 group-focus:opacity-100"
+        )}
+        onClick={onCheckboxClick}
+        aria-label={isSelected ? `Deselect ${image.fileName}` : `Select ${image.fileName}`}
+        title={isSelected ? "Deselect" : "Select"}
+        tabIndex={-1}
+      >
+        {isSelected ? (
+          <CheckSquare className="w-4 h-4 text-white drop-shadow-md" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.8))" }} />
+        ) : (
+          <Square className="w-4 h-4 text-white drop-shadow-md" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.8))" }} />
+        )}
+      </button>
+
+      {/* Selected tint overlay */}
+      {isSelected && (
+        <div className="absolute inset-0 bg-[#1456f0]/20 pointer-events-none" />
       )}
 
       {/* Hover overlay with metadata */}
@@ -235,10 +281,27 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
   // Ref for scroll position saving/restoring
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Reset page when folder or sort changes
+  // Bulk selection state
+  const {
+    selectedIds,
+    isSelected,
+    toggleSelection,
+    selectAll,
+    selectNone,
+    selectRange,
+    selectedCount,
+    hasSelection,
+  } = useBulkSelection();
+
+  // Track last clicked image id for shift-click range selection
+  const lastClickedIdRef = useRef<number | null>(null);
+
+  // Reset page when folder or sort changes, clear selection on filter changes
   useEffect(() => {
     setPage(1);
     setFocusedIndex(null);
+    selectNone();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, sort, order]);
 
   // Load images when selection, page, sort change
@@ -357,6 +420,47 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
     }
   };
 
+  // Handle thumbnail click — supports normal click, shift+click for range
+  const handleThumbnailClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, image: ImageItem, index: number) => {
+      if (hasSelection) {
+        // In selection mode: toggle selection
+        if (e.shiftKey && lastClickedIdRef.current !== null) {
+          selectRange(
+            images.map((img) => img.id),
+            lastClickedIdRef.current,
+            image.id
+          );
+        } else {
+          toggleSelection(image.id);
+        }
+        lastClickedIdRef.current = image.id;
+        return;
+      }
+      // Not in selection mode: open detail
+      openDetail(image.id);
+    },
+    [hasSelection, images, selectRange, toggleSelection, openDetail]
+  );
+
+  // Handle checkbox button click (always toggles selection)
+  const handleCheckboxClick = useCallback(
+    (e: React.MouseEvent, image: ImageItem) => {
+      e.stopPropagation();
+      if (e.shiftKey && lastClickedIdRef.current !== null) {
+        selectRange(
+          images.map((img) => img.id),
+          lastClickedIdRef.current,
+          image.id
+        );
+      } else {
+        toggleSelection(image.id);
+      }
+      lastClickedIdRef.current = image.id;
+    },
+    [images, selectRange, toggleSelection]
+  );
+
   // Keyboard navigation through grid
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, index: number) => {
@@ -374,7 +478,12 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
       else if (e.key === "ArrowUp") next = Math.max(index - cols, 0);
       else if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        openDetail(images[index].id);
+        if (hasSelection) {
+          toggleSelection(images[index].id);
+          lastClickedIdRef.current = images[index].id;
+        } else {
+          openDetail(images[index].id);
+        }
         return;
       }
 
@@ -383,8 +492,38 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
         setFocusedIndex(next);
       }
     },
-    [density, images, openDetail]
+    [density, images, openDetail, hasSelection, toggleSelection]
   );
+
+  // Global keyboard shortcuts for selection
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+
+      // Don't intercept if focus is in an input
+      if (
+        document.activeElement instanceof HTMLInputElement ||
+        document.activeElement instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (ctrlOrCmd && e.key === "a") {
+        e.preventDefault();
+        selectAll(images.map((img) => img.id));
+      } else if (ctrlOrCmd && (e.key === "d" || e.key === "D")) {
+        e.preventDefault();
+        selectNone();
+      } else if (e.key === "Escape" && hasSelection) {
+        e.preventDefault();
+        selectNone();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [images, selectAll, selectNone, hasSelection]);
 
   // ── Empty state ──────────────────────────────────────────────────────────────
 
@@ -399,11 +538,48 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
   }
 
   const totalImages = pagination?.total ?? 0;
+  const imageIds = images.map((img) => img.id);
+  const visibleSelectedCount = imageIds.filter((id) => selectedIds.has(id)).length;
+  const allVisibleSelected = images.length > 0 && visibleSelectedCount === images.length;
 
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-[var(--color-border)] flex-wrap gap-y-2">
+        {/* Select All/None controls */}
+        <button
+          onClick={() => {
+            if (allVisibleSelected) {
+              // Deselect all visible
+              for (const id of imageIds) {
+                if (selectedIds.has(id)) toggleSelection(id);
+              }
+            } else {
+              selectAll(imageIds);
+            }
+          }}
+          className={cn(
+            "flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)] text-xs font-medium transition-colors",
+            allVisibleSelected
+              ? "bg-[#1456f0]/10 text-[#1456f0] dark:bg-[#1456f0]/20 dark:text-[#60a5fa]"
+              : "text-[var(--color-text-secondary)] hover:bg-black/5 dark:hover:bg-white/5"
+          )}
+          title={allVisibleSelected ? "Deselect all visible" : "Select all visible"}
+          aria-label={allVisibleSelected ? "Deselect all visible images" : "Select all visible images"}
+          disabled={images.length === 0}
+        >
+          {allVisibleSelected ? (
+            <CheckSquare className="w-3.5 h-3.5" />
+          ) : (
+            <Square className="w-3.5 h-3.5" />
+          )}
+          {hasSelection ? (
+            <span>{selectedCount} selected</span>
+          ) : (
+            <span>Select</span>
+          )}
+        </button>
+
         {/* Image count */}
         <span className="text-sm text-[var(--color-text-muted)] mr-auto">
           {loading ? (
@@ -472,6 +648,15 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
         </div>
       </div>
 
+      {/* ── Bulk action toolbar (shown when items are selected) ──────────────── */}
+      {hasSelection && (
+        <BulkActionToolbar
+          selectedCount={selectedCount}
+          selectedIds={selectedIds}
+          onSelectNone={selectNone}
+        />
+      )}
+
       {/* ── Content area ────────────────────────────────────────────────────── */}
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
         {error ? (
@@ -501,9 +686,11 @@ export function ImageGrid({ selected, density, onDensityChange }: ImageGridProps
                     image={image}
                     density={density}
                     isFocused={focusedIndex === i}
+                    isSelected={isSelected(image.id)}
                     onFocus={() => setFocusedIndex(i)}
                     onKeyDown={(e) => handleKeyDown(e, i)}
-                    onClick={() => openDetail(image.id)}
+                    onClick={(e) => handleThumbnailClick(e, image, i)}
+                    onCheckboxClick={(e) => handleCheckboxClick(e, image)}
                   />
                 ))}
           </div>

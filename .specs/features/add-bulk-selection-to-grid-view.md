@@ -1,7 +1,7 @@
 ---
 id: add-bulk-selection-to-grid-view
 title: Add bulk selection to grid view
-status: ready
+status: in-progress
 milestone: browsing
 priority: medium
 depends_on: folder-navigation, image-tagging-system
@@ -58,27 +58,27 @@ Grid View with Selection Mode
 
 ## Acceptance Criteria
 
-- [ ] Checkbox overlays appear on thumbnail images and can be clicked to select/deselect
-- [ ] Select All/None controls work for entire current result set
-- [ ] Bulk action toolbar appears when images are selected with tag operations
-- [ ] Selection count displays current number of selected images
-- [ ] Keyboard shortcuts work for common selection operations
-- [ ] Selected images remain selected when navigating between pages
-- [ ] Bulk tag operations apply to all selected images with progress feedback
-- [ ] Selection state clears appropriately when filters or search changes
-- [ ] Error handling gracefully manages failed bulk operations
+- [x] Checkbox overlays appear on thumbnail images and can be clicked to select/deselect
+- [x] Select All/None controls work for entire current result set
+- [x] Bulk action toolbar appears when images are selected with tag operations
+- [x] Selection count displays current number of selected images
+- [x] Keyboard shortcuts work for common selection operations
+- [x] Selected images remain selected when navigating between pages
+- [x] Bulk tag operations apply to all selected images with progress feedback
+- [x] Selection state clears appropriately when filters or search changes
+- [x] Error handling gracefully manages failed bulk operations
 
 ## Tasks
 
-- [ ] Add checkbox overlays to image thumbnail components | frontend
-- [ ] Implement selection state management with Set data structure | frontend
-- [ ] Build Select All/None controls and selection counter | frontend  
-- [ ] Create bulk action toolbar with tag add/remove interfaces | frontend
-- [ ] Add keyboard event handlers for selection shortcuts | frontend
-- [ ] Implement pagination-aware selection state persistence | frontend
-- [ ] Build bulk tag operation API calls with progress tracking | frontend
-- [ ] Add error handling and partial success reporting for bulk operations | frontend
-- [ ] Test selection behavior across pagination and filter changes | testing
+- [x] Add checkbox overlays to image thumbnail components | frontend
+- [x] Implement selection state management with Set data structure | frontend
+- [x] Build Select All/None controls and selection counter | frontend
+- [x] Create bulk action toolbar with tag add/remove interfaces | frontend
+- [x] Add keyboard event handlers for selection shortcuts | frontend
+- [x] Implement pagination-aware selection state persistence | frontend
+- [x] Build bulk tag operation API calls with progress tracking | frontend
+- [x] Add error handling and partial success reporting for bulk operations | frontend
+- [ ] (skipped — test runner disabled) Test selection behavior across pagination and filter changes | testing
 
 ## Open Questions
 

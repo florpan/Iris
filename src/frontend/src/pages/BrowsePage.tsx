@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Loader2, ImageOff, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, ImageOff, Filter, ChevronLeft, ChevronRight, CheckSquare, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FacetPanel, type FacetFilters, type FacetData } from "@/components/FacetPanel";
 import { StatsDashboard } from "@/components/StatsDashboard";
@@ -20,8 +20,10 @@ import { EmptyState } from "@/components/EmptyState";
 import type { GridDensity } from "@/components/ImageGrid";
 import { TimelineView } from "@/components/TimelineView";
 import { MapView } from "@/components/MapView";
+import { BulkActionToolbar } from "@/components/BulkActionToolbar";
 import { useAppState } from "@/hooks/useAppState";
 import { useMapConfig } from "@/hooks/useMapConfig";
+import { useBulkSelection } from "@/hooks/useBulkSelection";
 import {
   buildImageDetailUrl,
   saveScrollPosition,
@@ -133,12 +135,14 @@ interface ThumbnailProps {
   image: ImageItem;
   density: GridDensity;
   isFocused: boolean;
+  isSelected: boolean;
   onFocus: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onCheckboxClick: (e: React.MouseEvent) => void;
 }
 
-function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: ThumbnailProps) {
+function Thumbnail({ image, density, isFocused, isSelected, onFocus, onKeyDown, onClick, onCheckboxClick }: ThumbnailProps) {
   const [imgError, setImgError] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -154,9 +158,11 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: T
       tabIndex={0}
       role="button"
       aria-label={image.fileName}
+      aria-pressed={isSelected}
       className={cn(
         "group relative rounded-[var(--radius-comfortable)] overflow-hidden bg-[var(--color-bg-secondary)] dark:bg-[var(--color-border)] cursor-pointer",
         "focus:outline-none focus:ring-2 focus:ring-[#1456f0] focus:ring-offset-1",
+        isSelected && "ring-2 ring-[#1456f0] ring-offset-1",
         DENSITY_CONFIG[density].thumbClass
       )}
       onFocus={onFocus}
@@ -176,6 +182,32 @@ function Thumbnail({ image, density, isFocused, onFocus, onKeyDown, onClick }: T
         <div className="w-full h-full flex items-center justify-center">
           <ImageOff className="w-6 h-6 text-[var(--color-text-muted)]" />
         </div>
+      )}
+
+      {/* Selection checkbox overlay */}
+      <button
+        className={cn(
+          "absolute top-1 left-1 z-10 rounded transition-all duration-150",
+          "focus:outline-none focus:ring-1 focus:ring-white",
+          isSelected
+            ? "opacity-100"
+            : "opacity-0 group-hover:opacity-100 group-focus:opacity-100"
+        )}
+        onClick={onCheckboxClick}
+        aria-label={isSelected ? `Deselect ${image.fileName}` : `Select ${image.fileName}`}
+        title={isSelected ? "Deselect" : "Select"}
+        tabIndex={-1}
+      >
+        {isSelected ? (
+          <CheckSquare className="w-4 h-4 text-white" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.8))" }} />
+        ) : (
+          <Square className="w-4 h-4 text-white" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.8))" }} />
+        )}
+      </button>
+
+      {/* Selected tint overlay */}
+      {isSelected && (
+        <div className="absolute inset-0 bg-[#1456f0]/20 pointer-events-none" />
       )}
 
       <div
@@ -228,6 +260,21 @@ export function BrowsePage() {
   const [imagesLoading, setImagesLoading] = useState(false);
   const [imagesError, setImagesError] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
+  // Bulk selection state
+  const {
+    selectedIds,
+    isSelected,
+    toggleSelection,
+    selectAll,
+    selectNone,
+    selectRange,
+    selectedCount,
+    hasSelection,
+  } = useBulkSelection();
+
+  // Track last clicked image id for shift-click range selection
+  const lastClickedIdRef = useRef<number | null>(null);
 
   // ── Load facets ─────────────────────────────────────────────────────────────
 
@@ -313,6 +360,8 @@ export function BrowsePage() {
       setFilters(newFilters);
       setPage(1);
       setFocusedIndex(null);
+      // Clear selection when filters change
+      selectNone();
 
       // Update URL
       const qs = buildQueryString(newFilters, 1);
@@ -321,13 +370,14 @@ export function BrowsePage() {
       loadFacets(newFilters);
       loadImages(newFilters, 1);
     },
-    [loadFacets, loadImages]
+    [loadFacets, loadImages, selectNone]
   );
 
   const handlePageChange = useCallback(
     (p: number) => {
       setPage(p);
       setFocusedIndex(null);
+      // Selection persists across pagination (by design — users can select across pages)
 
       const qs = buildQueryString(filters, p);
       window.history.replaceState(null, "", `/browse${qs.toString() ? `?${qs}` : ""}`);
@@ -400,6 +450,45 @@ export function BrowsePage() {
     window.history.back();
   }, []);
 
+  // Handle thumbnail click — normal click opens detail; if selection active, toggles
+  const handleThumbnailClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, image: ImageItem) => {
+      if (hasSelection) {
+        if (e.shiftKey && lastClickedIdRef.current !== null) {
+          selectRange(
+            imageList.map((img) => img.id),
+            lastClickedIdRef.current,
+            image.id
+          );
+        } else {
+          toggleSelection(image.id);
+        }
+        lastClickedIdRef.current = image.id;
+        return;
+      }
+      openDetail(image.id);
+    },
+    [hasSelection, imageList, selectRange, toggleSelection, openDetail]
+  );
+
+  // Handle checkbox click (always toggles selection)
+  const handleCheckboxClick = useCallback(
+    (e: React.MouseEvent, image: ImageItem) => {
+      e.stopPropagation();
+      if (e.shiftKey && lastClickedIdRef.current !== null) {
+        selectRange(
+          imageList.map((img) => img.id),
+          lastClickedIdRef.current,
+          image.id
+        );
+      } else {
+        toggleSelection(image.id);
+      }
+      lastClickedIdRef.current = image.id;
+    },
+    [imageList, selectRange, toggleSelection]
+  );
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, index: number) => {
       const cols = { small: 6, medium: 4, large: 3 }[density];
@@ -410,7 +499,12 @@ export function BrowsePage() {
       else if (e.key === "ArrowUp") next = Math.max(index - cols, 0);
       else if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        openDetail(imageList[index].id);
+        if (hasSelection) {
+          toggleSelection(imageList[index].id);
+          lastClickedIdRef.current = imageList[index].id;
+        } else {
+          openDetail(imageList[index].id);
+        }
         return;
       }
       if (next !== null) {
@@ -418,8 +512,38 @@ export function BrowsePage() {
         setFocusedIndex(next);
       }
     },
-    [density, imageList, openDetail]
+    [density, imageList, openDetail, hasSelection, toggleSelection]
   );
+
+  // Global keyboard shortcuts for selection
+  useEffect(() => {
+    const handleGlobalKeyDown = (kbdEvent: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const ctrlOrCmd = isMac ? kbdEvent.metaKey : kbdEvent.ctrlKey;
+
+      // Don't intercept if focus is in an input
+      if (
+        document.activeElement instanceof HTMLInputElement ||
+        document.activeElement instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (ctrlOrCmd && kbdEvent.key === "a") {
+        kbdEvent.preventDefault();
+        selectAll(imageList.map((img) => img.id));
+      } else if (ctrlOrCmd && (kbdEvent.key === "d" || kbdEvent.key === "D")) {
+        kbdEvent.preventDefault();
+        selectNone();
+      } else if (kbdEvent.key === "Escape" && hasSelection) {
+        kbdEvent.preventDefault();
+        selectNone();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [imageList, selectAll, selectNone, hasSelection]);
 
   const totalImages = pagination?.total ?? facets?.total ?? 0;
   const activeFilterCount = [
@@ -429,6 +553,10 @@ export function BrowsePage() {
     filters.isoMin || filters.isoMax,
     filters.tags,
   ].filter(Boolean).length;
+
+  const imageIds = imageList.map((img) => img.id);
+  const visibleSelectedCount = imageIds.filter((id) => selectedIds.has(id)).length;
+  const allVisibleSelected = imageList.length > 0 && visibleSelectedCount === imageList.length;
 
   return (
     <div className="flex h-full min-h-0 overflow-hidden">
@@ -499,6 +627,39 @@ export function BrowsePage() {
             )}
           </span>
 
+          {/* Select All / None control */}
+          <button
+            onClick={() => {
+              if (allVisibleSelected) {
+                for (const id of imageIds) {
+                  if (selectedIds.has(id)) toggleSelection(id);
+                }
+              } else {
+                selectAll(imageIds);
+              }
+            }}
+            className={cn(
+              "flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)] text-xs font-medium transition-colors",
+              allVisibleSelected
+                ? "bg-[#1456f0]/10 text-[#1456f0] dark:bg-[#1456f0]/20 dark:text-[#60a5fa]"
+                : "text-[var(--color-text-secondary)] hover:bg-black/5 dark:hover:bg-white/5"
+            )}
+            title={allVisibleSelected ? "Deselect all visible" : "Select all visible"}
+            aria-label={allVisibleSelected ? "Deselect all visible images" : "Select all visible images"}
+            disabled={imageList.length === 0}
+          >
+            {allVisibleSelected ? (
+              <CheckSquare className="w-3.5 h-3.5" />
+            ) : (
+              <Square className="w-3.5 h-3.5" />
+            )}
+            {hasSelection ? (
+              <span>{selectedCount} selected</span>
+            ) : (
+              <span>Select</span>
+            )}
+          </button>
+
           {/* Density controls */}
           <div className="flex items-center gap-0.5 border border-[var(--color-border)] rounded-[var(--radius-md)] p-0.5 ml-auto">
             {(["small", "medium", "large"] as GridDensity[]).map((d) => (
@@ -518,6 +679,15 @@ export function BrowsePage() {
             ))}
           </div>
         </div>
+
+        {/* Bulk action toolbar (shown when items are selected and grid is visible) */}
+        {hasSelection && viewMode !== "timeline" && viewMode !== "map" && (
+          <BulkActionToolbar
+            selectedCount={selectedCount}
+            selectedIds={selectedIds}
+            onSelectNone={selectNone}
+          />
+        )}
 
         {/* Map view */}
         {viewMode === "map" && (
@@ -589,9 +759,11 @@ export function BrowsePage() {
                       image={image}
                       density={density}
                       isFocused={focusedIndex === i}
+                      isSelected={isSelected(image.id)}
                       onFocus={() => setFocusedIndex(i)}
                       onKeyDown={(e) => handleKeyDown(e, i)}
-                      onClick={() => openDetail(image.id)}
+                      onClick={(e) => handleThumbnailClick(e, image)}
+                      onCheckboxClick={(e) => handleCheckboxClick(e, image)}
                     />
                   ))}
             </div>
