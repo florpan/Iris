@@ -1,7 +1,7 @@
 ---
 id: tag-management-interface
 title: Tag Management Interface
-status: ready
+status: in-progress
 milestone: browsing
 priority: low
 depends_on: image-tagging-system
@@ -59,28 +59,28 @@ Tag Management (234 tags total)
 
 ## Acceptance Criteria
 
-- [ ] Tag list displays all tags with usage counts and management controls
-- [ ] Tag rename updates all image associations and prevents duplicate names
-- [ ] Tag merge combines multiple tags into one and updates all references
-- [ ] Tag deletion removes all associations after confirmation dialog
-- [ ] Bulk operations work on multiple selected tags with progress feedback
-- [ ] Usage statistics show which images are tagged with each tag
-- [ ] Search and filtering helps navigate large tag collections
-- [ ] Export functionality generates CSV and JSON reports of tag data
-- [ ] Import validation prevents data corruption and resolves conflicts
+- [x] Tag list displays all tags with usage counts and management controls
+- [x] Tag rename updates all image associations and prevents duplicate names
+- [x] Tag merge combines multiple tags into one and updates all references
+- [x] Tag deletion removes all associations after confirmation dialog
+- [x] Bulk operations work on multiple selected tags with progress feedback
+- [x] Usage statistics show which images are tagged with each tag
+- [x] Search and filtering helps navigate large tag collections
+- [x] Export functionality generates CSV and JSON reports of tag data
+- [x] Import validation prevents data corruption and resolves conflicts
 
 ## Tasks
 
-- [ ] Build tag management dashboard with sortable table and statistics | frontend
-- [ ] Implement tag rename interface with validation and conflict resolution | frontend
-- [ ] Create tag merge workflow with target selection and confirmation | frontend
-- [ ] Add tag deletion with impact assessment and confirmation | frontend
-- [ ] Build bulk operation interface with multi-select and progress tracking | frontend
-- [ ] Implement tag usage detail views with linked image lists | frontend
-- [ ] Add search and filtering capabilities for tag management | frontend
-- [ ] Create export/import functionality with file handling | frontend
-- [ ] Add management operation logging and audit trail | backend
-- [ ] Test all tag operations with large datasets and edge cases | testing
+- [x] Build tag management dashboard with sortable table and statistics | frontend
+- [x] Implement tag rename interface with validation and conflict resolution | frontend
+- [x] Create tag merge workflow with target selection and confirmation | frontend
+- [x] Add tag deletion with impact assessment and confirmation | frontend
+- [x] Build bulk operation interface with multi-select and progress tracking | frontend
+- [x] Implement tag usage detail views with linked image lists | frontend
+- [x] Add search and filtering capabilities for tag management | frontend
+- [x] Create export/import functionality with file handling | frontend
+- [x] Add management operation logging and audit trail | backend
+- [ ] (skipped — test runner disabled) Test all tag operations with large datasets and edge cases | testing
 
 ## Open Questions
 

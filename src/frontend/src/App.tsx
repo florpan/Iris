@@ -4,6 +4,7 @@ import { LibraryPage } from "./pages/LibraryPage";
 import { FolderPage } from "./pages/FolderPage";
 import { SearchPage } from "./pages/SearchPage";
 import { BrowsePage } from "./pages/BrowsePage";
+import { TagManagementPage } from "./pages/TagManagementPage";
 import { ImageDetailDeepLink } from "./pages/ImageDetailDeepLink";
 import { useTheme } from "./hooks/useTheme";
 
@@ -54,6 +55,8 @@ function App() {
     page = <SearchPage />;
   } else if (path === "/browse") {
     page = <BrowsePage />;
+  } else if (path === "/tags" || path.startsWith("/tags/")) {
+    page = <TagManagementPage />;
   } else {
     page = <LibraryPage />;
   }
@@ -66,6 +69,7 @@ function App() {
     if (fromParam === "search") navPath = "/search";
     else if (fromParam === "folder") navPath = "/folders";
     else if (fromParam === "browse") navPath = "/browse";
+    else if (fromParam === "tags") navPath = "/tags";
     else navPath = "/";
   }
 

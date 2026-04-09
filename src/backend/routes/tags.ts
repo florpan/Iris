@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { and, eq, ilike, sql, asc, desc, inArray } from "drizzle-orm";
 import { db } from "../db/client";
-import { tags, imageTags, images } from "../db/schema";
+import { tags, imageTags, images, tagManagementLog } from "../db/schema";
 
 // ── Tag Validation ───────────────────────────────────────────────────────────
 
@@ -207,6 +207,14 @@ tagsRouter.put("/:id", async (c) => {
     .where(eq(tags.id, id))
     .returning();
 
+  // Log rename if name changed
+  if (updates.name && updates.name !== existing.name) {
+    await db.insert(tagManagementLog).values({
+      operation: "rename",
+      details: { tagId: id, oldName: existing.name, newName: updates.name },
+    });
+  }
+
   return c.json({ data: updated });
 });
 
@@ -221,7 +229,7 @@ tagsRouter.delete("/:id", async (c) => {
   }
 
   const [existing] = await db
-    .select({ id: tags.id })
+    .select({ id: tags.id, name: tags.name })
     .from(tags)
     .where(eq(tags.id, id));
 
@@ -230,6 +238,12 @@ tagsRouter.delete("/:id", async (c) => {
   }
 
   await db.delete(tags).where(eq(tags.id, id));
+
+  // Log the delete operation
+  await db.insert(tagManagementLog).values({
+    operation: "delete",
+    details: { tagId: id, tagName: existing.name },
+  });
 
   return c.json({ success: true });
 });
@@ -343,6 +357,322 @@ tagsRouter.post("/bulk/remove", async (c) => {
   });
 
   return c.json({ success: true, removed: { imageIds, tagIds } });
+});
+
+/**
+ * GET /api/tags/export?format=csv|json — export all tags as CSV or JSON.
+ *
+ * Query params:
+ *   format — "csv" | "json" (default: "json")
+ */
+tagsRouter.get("/export", async (c) => {
+  const format = c.req.query("format") ?? "json";
+
+  const rows = await db
+    .select()
+    .from(tags)
+    .orderBy(desc(tags.usageCount), asc(tags.name));
+
+  if (format === "csv") {
+    const lines = ["id,name,color,usage_count,created_at"];
+    for (const tag of rows) {
+      const escapedName = tag.name.includes(",") ? `"${tag.name}"` : tag.name;
+      const color = tag.color ?? "";
+      lines.push(
+        `${tag.id},${escapedName},${color},${tag.usageCount},${tag.createdAt?.toISOString() ?? ""}`
+      );
+    }
+    c.header("Content-Type", "text/csv");
+    c.header("Content-Disposition", 'attachment; filename="iris-tags.csv"');
+    return c.body(lines.join("\n"));
+  }
+
+  // JSON export
+  c.header("Content-Type", "application/json");
+  c.header("Content-Disposition", 'attachment; filename="iris-tags.json"');
+  return c.body(
+    JSON.stringify({ exported_at: new Date().toISOString(), tags: rows }, null, 2)
+  );
+});
+
+/**
+ * POST /api/tags/import — import tags from JSON or CSV.
+ *
+ * Body: { tags: Array<{ name: string, color?: string }> }
+ *
+ * Returns counts of created, skipped (duplicate), and failed tags.
+ */
+tagsRouter.post("/import", async (c) => {
+  const body = await c.req.json().catch(() => {
+    throw new HTTPException(400, { message: "Invalid JSON body" });
+  });
+
+  const tagList: Array<{ name: string; color?: string }> = Array.isArray(body.tags)
+    ? body.tags
+    : [];
+
+  if (tagList.length === 0) {
+    throw new HTTPException(400, { message: "No tags provided in import body" });
+  }
+
+  let created = 0;
+  let skipped = 0;
+  let failed = 0;
+  const errors: string[] = [];
+
+  for (const item of tagList) {
+    try {
+      const name = validateTagName(item.name ?? "");
+      const color = item.color ?? null;
+
+      const existing = await db
+        .select({ id: tags.id })
+        .from(tags)
+        .where(eq(tags.name, name))
+        .limit(1);
+
+      if (existing.length > 0) {
+        skipped++;
+        continue;
+      }
+
+      await db.insert(tags).values({ name, color });
+      created++;
+    } catch (e) {
+      failed++;
+      errors.push(e instanceof Error ? e.message : "Unknown error");
+    }
+  }
+
+  // Log the import operation
+  await db.insert(tagManagementLog).values({
+    operation: "import",
+    details: { created, skipped, failed, total: tagList.length },
+  });
+
+  return c.json({ data: { created, skipped, failed, errors } });
+});
+
+/**
+ * POST /api/tags/merge — merge source tags into a target tag.
+ *
+ * Body: { sourceTagIds: number[], targetTagId: number }
+ *
+ * All image associations from source tags are moved to the target tag,
+ * then source tags are deleted.
+ */
+tagsRouter.post("/merge", async (c) => {
+  const body = await c.req.json().catch(() => {
+    throw new HTTPException(400, { message: "Invalid JSON body" });
+  });
+
+  const sourceTagIds: number[] = Array.isArray(body.sourceTagIds)
+    ? body.sourceTagIds.map(Number).filter(Number.isFinite)
+    : [];
+  const targetTagId = Number(body.targetTagId);
+
+  if (sourceTagIds.length === 0) {
+    throw new HTTPException(400, { message: "sourceTagIds must be a non-empty array" });
+  }
+  if (!Number.isFinite(targetTagId)) {
+    throw new HTTPException(400, { message: "Invalid targetTagId" });
+  }
+  if (sourceTagIds.includes(targetTagId)) {
+    throw new HTTPException(400, { message: "targetTagId cannot be one of the sourceTagIds" });
+  }
+
+  // Verify target tag exists
+  const [targetTag] = await db.select().from(tags).where(eq(tags.id, targetTagId));
+  if (!targetTag) {
+    throw new HTTPException(404, { message: "Target tag not found" });
+  }
+
+  // Verify all source tags exist
+  const sourceTags = await db
+    .select()
+    .from(tags)
+    .where(inArray(tags.id, sourceTagIds));
+
+  if (sourceTags.length !== sourceTagIds.length) {
+    throw new HTTPException(400, { message: "One or more source tags not found" });
+  }
+
+  const sourceNames = sourceTags.map((t) => t.name);
+
+  await db.transaction(async (tx) => {
+    // For each source tag, move its image associations to the target tag
+    for (const sourceId of sourceTagIds) {
+      // Find images tagged with the source tag that are NOT already tagged with target
+      const sourceImageIds = await tx
+        .select({ imageId: imageTags.imageId })
+        .from(imageTags)
+        .where(eq(imageTags.tagId, sourceId));
+
+      for (const { imageId } of sourceImageIds) {
+        // Insert into target (ignore conflicts — image may already have target tag)
+        await tx
+          .insert(imageTags)
+          .values({ imageId, tagId: targetTagId })
+          .onConflictDoNothing();
+      }
+
+      // Delete all source tag associations
+      await tx.delete(imageTags).where(eq(imageTags.tagId, sourceId));
+
+      // Delete the source tag itself
+      await tx.delete(tags).where(eq(tags.id, sourceId));
+    }
+
+    // Recompute usage_count for target tag
+    await tx
+      .update(tags)
+      .set({
+        usageCount: sql`(SELECT count(*)::int FROM image_tags WHERE tag_id = ${targetTagId})`,
+      })
+      .where(eq(tags.id, targetTagId));
+  });
+
+  // Log the merge operation
+  await db.insert(tagManagementLog).values({
+    operation: "merge",
+    details: {
+      sourceTagIds,
+      sourceNames,
+      targetTagId,
+      targetName: targetTag.name,
+    },
+  });
+
+  const [updatedTarget] = await db.select().from(tags).where(eq(tags.id, targetTagId));
+  return c.json({ data: updatedTarget });
+});
+
+/**
+ * DELETE /api/tags/bulk — delete multiple tags by ID.
+ *
+ * Body: { tagIds: number[] }
+ */
+tagsRouter.delete("/bulk", async (c) => {
+  const body = await c.req.json().catch(() => {
+    throw new HTTPException(400, { message: "Invalid JSON body" });
+  });
+
+  const tagIds: number[] = Array.isArray(body.tagIds)
+    ? body.tagIds.map(Number).filter(Number.isFinite)
+    : [];
+
+  if (tagIds.length === 0) {
+    throw new HTTPException(400, { message: "tagIds must be a non-empty array" });
+  }
+
+  // Get tag names for audit log
+  const existingTags = await db
+    .select({ id: tags.id, name: tags.name })
+    .from(tags)
+    .where(inArray(tags.id, tagIds));
+
+  if (existingTags.length === 0) {
+    throw new HTTPException(404, { message: "No matching tags found" });
+  }
+
+  const foundIds = existingTags.map((t) => t.id);
+
+  await db.delete(tags).where(inArray(tags.id, foundIds));
+
+  // Log the bulk delete
+  await db.insert(tagManagementLog).values({
+    operation: "bulk_delete",
+    details: {
+      tagIds: foundIds,
+      tagNames: existingTags.map((t) => t.name),
+      count: foundIds.length,
+    },
+  });
+
+  return c.json({ success: true, deleted: foundIds.length });
+});
+
+/**
+ * GET /api/tags/:id/images — list images that have a specific tag.
+ *
+ * Query params:
+ *   page     — page number (default: 1)
+ *   pageSize — results per page (default: 50, max: 200)
+ */
+tagsRouter.get("/:id/images", async (c) => {
+  const id = Number(c.req.param("id"));
+  if (!Number.isFinite(id)) {
+    throw new HTTPException(400, { message: "Invalid tag ID" });
+  }
+
+  const pageParam = Number(c.req.query("page") ?? "1");
+  const pageSizeParam = Number(c.req.query("pageSize") ?? "50");
+  const page = Math.max(1, Number.isFinite(pageParam) ? pageParam : 1);
+  const pageSize = Math.min(200, Math.max(1, Number.isFinite(pageSizeParam) ? pageSizeParam : 50));
+  const offset = (page - 1) * pageSize;
+
+  // Verify tag exists
+  const [tag] = await db.select().from(tags).where(eq(tags.id, id));
+  if (!tag) {
+    throw new HTTPException(404, { message: "Tag not found" });
+  }
+
+  // Count total images for this tag
+  const [countRow] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(imageTags)
+    .where(eq(imageTags.tagId, id));
+
+  const total = countRow?.count ?? 0;
+
+  // Fetch paginated images
+  const rows = await db
+    .select({
+      id: images.id,
+      fileName: images.fileName,
+      relativePath: images.relativePath,
+      thumbnailPath: images.thumbnailPath,
+      takenAt: images.takenAt,
+      width: images.width,
+      height: images.height,
+      mimeType: images.mimeType,
+    })
+    .from(imageTags)
+    .innerJoin(images, eq(imageTags.imageId, images.id))
+    .where(eq(imageTags.tagId, id))
+    .orderBy(desc(images.takenAt), asc(images.fileName))
+    .limit(pageSize)
+    .offset(offset);
+
+  return c.json({
+    tag,
+    data: rows,
+    pagination: {
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    },
+  });
+});
+
+/**
+ * GET /api/tags/log — retrieve management operation audit log.
+ *
+ * Query params:
+ *   limit  — max entries to return (default: 50, max: 200)
+ */
+tagsRouter.get("/log", async (c) => {
+  const limitParam = Number(c.req.query("limit") ?? "50");
+  const limit = Math.min(200, Math.max(1, Number.isFinite(limitParam) ? limitParam : 50));
+
+  const rows = await db
+    .select()
+    .from(tagManagementLog)
+    .orderBy(desc(tagManagementLog.createdAt))
+    .limit(limit);
+
+  return c.json({ data: rows });
 });
 
 // ── Image Tags Router (/api/images) ─────────────────────────────────────────

@@ -156,6 +156,22 @@ export const sourceSyncStatus = pgTable("source_sync_status", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ── Tag Management Audit Log ──────────────────────────────────────────────────
+// Records tag management operations: rename, merge, delete, import, etc.
+export const tagManagementLog = pgTable(
+  "tag_management_log",
+  {
+    id: serial("id").primaryKey(),
+    operation: text("operation").notNull(), // "rename" | "merge" | "delete" | "bulk_delete" | "import"
+    details: jsonb("details").$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("tag_mgmt_log_created_at_idx").on(table.createdAt),
+    index("tag_mgmt_log_operation_idx").on(table.operation),
+  ]
+);
+
 // ── Type Helpers ─────────────────────────────────────────────────────────────
 export type Image = typeof images.$inferSelect;
 export type NewImage = typeof images.$inferInsert;
@@ -166,3 +182,4 @@ export type SourceSyncStatus = typeof sourceSyncStatus.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
 export type NewTag = typeof tags.$inferInsert;
 export type ImageTag = typeof imageTags.$inferSelect;
+export type TagManagementLog = typeof tagManagementLog.$inferSelect;
