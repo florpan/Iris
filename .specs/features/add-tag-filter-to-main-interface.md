@@ -1,7 +1,7 @@
 ---
 id: add-tag-filter-to-main-interface
 title: Add tag filter to main interface
-status: in-progress
+status: complete
 milestone: browsing
 priority: medium
 depends_on: main-interface-screen, image-tagging-system, metadata-filtering
