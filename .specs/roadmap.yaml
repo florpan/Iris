@@ -13,7 +13,7 @@ milestones:
   - id: views
     title: Advanced Views
     target: Post-MVP
-    status: in-progress
+    status: complete
     description: Map view, timeline view, and advanced filtering
   - id: smart
     title: Smart Features
