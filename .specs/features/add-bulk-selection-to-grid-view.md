@@ -1,7 +1,7 @@
 ---
 id: add-bulk-selection-to-grid-view
 title: Add bulk selection to grid view
-status: in-progress
+status: complete
 milestone: browsing
 priority: medium
 depends_on: folder-navigation, image-tagging-system
