@@ -30,7 +30,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Sources** (`/api/sources`) — CRUD for source folders (register, enable/disable, list)
 - **Images** (`/api/images`) — list/get images with pagination, filtering, sorting; bulk selection support
 - **Image Serving** (`/api/images/:id/original`) — stream original images from source folders with RAW preview support for non-JPEG formats
-- **Thumbnails** (`/api/thumbnails`, `/api/images/:id/thumb`) — serve generated thumbnail files with caching headers
+- **Thumbnails** (`/api/thumbnails`, `/api/images/:id/thumb`) — serve generated thumbnail files with caching headers; regeneration endpoint for settings changes
 - **Folders** (`/api/folders`) — folder tree listing and contents for folder-based navigation
 - **Tags** (`/api/tags`) — tag CRUD, rename, merge, bulk delete, import from IPTC; per-image tag assignment (`/api/images/:id/tags`)
 - **Sync** (`/api/sync`) — trigger scans, view sync run history and status per source
@@ -59,6 +59,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Filter by facets** — use facet panel to filter by camera, lens, date range, tags, file type
 - **Map exploration** — switch to map view -> see geotagged images as clustered markers on Leaflet map
 - **Timeline browsing** — switch to timeline view -> images grouped chronologically
+- **Thumbnail regeneration** — change thumbnail format/size settings -> trigger regeneration -> all thumbnails rebuilt with new settings
 
 ## External Integrations
 - None (fully self-hosted, no external API calls)
