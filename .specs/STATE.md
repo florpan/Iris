@@ -16,7 +16,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 
 ## Screens / Pages
 - **Library** (`/`) — main grid view of all images with facet filtering, bulk selection, and tag filtering
-- **Folders** (`/folders`, `/folders/:path`) — folder tree navigation mirroring source directory structure
+- **Folders** (`/folders`, `/folders/:path`) — folder tree navigation mirroring source directory structure; sidebar folder tree with breadcrumb navigation, configurable thumbnail grid density, pagination/virtual scrolling, sort controls, and per-folder image counts
 - **Search** (`/search`) — text search with metadata filters
 - **Browse** (`/browse`) — browse/explore mode
 - **Tags** (`/tags`) — tag management: create, rename, merge, delete, bulk operations, import from IPTC keywords; audit log
@@ -31,7 +31,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Images** (`/api/images`) — list/get images with pagination, filtering, sorting; bulk selection support
 - **Image Serving** (`/api/images/:id/original`) — stream original images from source folders with RAW preview support for non-JPEG formats
 - **Thumbnails** (`/api/thumbnails`, `/api/images/:id/thumb`) — serve generated thumbnail files with caching headers; regeneration endpoint for settings changes
-- **Folders** (`/api/folders`) — folder tree listing and contents for folder-based navigation
+- **Folders** (`/api/folders`) — folder tree listing and contents for folder-based navigation; folder tree structure with image counts (direct and recursive); paginated images within specific folders
 - **Tags** (`/api/tags`) — tag CRUD, rename, merge, bulk delete, import from IPTC; per-image tag assignment (`/api/images/:id/tags`)
 - **Sync** (`/api/sync`) — trigger scans, view sync run history and status per source; incremental sync with change detection
 - **Stats** (`/api/stats`) — dashboard statistics (counts, storage, camera/lens breakdowns)
@@ -51,7 +51,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 
 ## User Flows
 - **Add source and sync** — register a folder path as source -> trigger sync -> scanner walks filesystem, extracts metadata with exifr, generates thumbnails with sharp -> images appear in library
-- **Browse by folder** — navigate folder tree -> select subfolder -> view paginated image grid for that folder
+- **Browse by folder** — navigate folder tree -> select subfolder -> view paginated image grid for that folder; use sidebar tree navigation with image counts to explore directory structure, adjust grid density and sorting options
 - **Search images** — enter text query and/or metadata filters -> results displayed in grid with pagination
 - **View image detail** — click image in any grid -> modal/deep-link detail view with full metadata, GPS map, tags -> keyboard arrow navigation between images
 - **Tag images** — open image detail -> add/remove tags; or use bulk selection in grid -> apply tags to multiple images
@@ -71,4 +71,4 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - No image editing or RAW processing
 - Custom routing (pushState-based) rather than a router library
 - Docker compose only provides PostgreSQL; the app itself runs directly via Bun
-- Three features are spec'd but not yet implemented: empty state/loading screens, missing file status indicators, and the tagging spec (separate from the implemented tagging system)
+- Two features are spec'd but not yet implemented: empty state/loading screens and missing file status indicators
