@@ -15,10 +15,10 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - Single user — full access, no auth required
 
 ## Screens / Pages
-- **Library** (`/`) — main grid view of all images with facet filtering, bulk selection, and tag filtering
-- **Folders** (`/folders`, `/folders/:path`) — folder tree navigation mirroring source directory structure; sidebar folder tree with breadcrumb navigation, configurable thumbnail grid density, pagination/virtual scrolling, sort controls, and per-folder image counts
-- **Search** (`/search`) — text search with metadata filters
-- **Browse** (`/browse`) — browse/explore mode
+- **Library** (`/`) — main grid view of all images with facet filtering, bulk selection, and tag filtering; includes multi-select capabilities with checkbox overlays, Select All/None controls, and bulk action toolbar for batch operations like tagging multiple images
+- **Folders** (`/folders`, `/folders/:path`) — folder tree navigation mirroring source directory structure; sidebar folder tree with breadcrumb navigation, configurable thumbnail grid density, pagination/virtual scrolling, sort controls, and per-folder image counts; supports bulk selection and batch operations on images within folders
+- **Search** (`/search`) — text search with metadata filters; includes bulk selection capabilities for search results
+- **Browse** (`/browse`) — browse/explore mode with bulk selection support
 - **Tags** (`/tags`) — tag management: create, rename, merge, delete, bulk operations, import from IPTC keywords; audit log
 - **Image Detail** (`/image/:id`) — full metadata panel, GPS mini-map, tagging, keyboard navigation between images; accessible as modal overlay or deep link; displays full-resolution original images from source folders with organized metadata sections for camera info, file details, location, and IPTC data; includes zoom/pan support and RAW file preview handling
 - **Map View** — Leaflet map showing geotagged images with marker clustering
@@ -28,11 +28,11 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Health** (`/api/health`) — readiness check
 - **Config** (`/api/config`) — application settings (work dir, thumbnail format)
 - **Sources** (`/api/sources`) — CRUD for source folders (register, enable/disable, list)
-- **Images** (`/api/images`) — list/get images with pagination, filtering, sorting; bulk selection support
+- **Images** (`/api/images`) — list/get images with pagination, filtering, sorting; bulk selection support; bulk tag operations for multiple images with progress tracking and error handling
 - **Image Serving** (`/api/images/:id/original`) — stream original images from source folders with RAW preview support for non-JPEG formats
 - **Thumbnails** (`/api/thumbnails`, `/api/images/:id/thumb`) — serve generated thumbnail files with caching headers; regeneration endpoint for settings changes
 - **Folders** (`/api/folders`) — folder tree listing and contents for folder-based navigation; folder tree structure with image counts (direct and recursive); paginated images within specific folders
-- **Tags** (`/api/tags`) — tag CRUD, rename, merge, bulk delete, import from IPTC; per-image tag assignment (`/api/images/:id/tags`) with autocomplete/suggestion functionality, validation, and usage tracking
+- **Tags** (`/api/tags`) — tag CRUD, rename, merge, bulk delete, import from IPTC; per-image tag assignment (`/api/images/:id/tags`) with autocomplete/suggestion functionality, validation, and usage tracking; bulk tag operations across multiple images
 - **Sync** (`/api/sync`) — trigger scans, view sync run history and status per source; incremental sync with change detection
 - **Stats** (`/api/stats`) — dashboard statistics (counts, storage, camera/lens breakdowns)
 - **Search** (`/api/search`) — full-text and metadata search with pagination
@@ -61,6 +61,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Timeline browsing** — switch to timeline view -> images grouped chronologically
 - **Thumbnail regeneration** — change thumbnail format/size settings -> trigger regeneration -> all thumbnails rebuilt with new settings
 - **Scheduled sync** — background sync engine runs on configurable interval -> incrementally scans sources for changes -> processes new/modified files, marks removed files as missing -> progress visible in UI with sync history
+- **Bulk operations** — select multiple images using checkboxes in grid view -> Select All/None controls or keyboard shortcuts (Ctrl+A, Shift+click for range selection) -> bulk action toolbar appears -> apply batch operations like adding/removing tags -> progress feedback and error handling for failed operations
 
 ## External Integrations
 - None (fully self-hosted, no external API calls)
