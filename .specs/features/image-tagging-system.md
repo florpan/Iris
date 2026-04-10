@@ -4,7 +4,7 @@ title: Image Tagging System
 status: complete
 milestone: browsing
 priority: high
-depends_on: image-metadata-display, sync-engine
+depends_on: sync-engine
 handoff: single
 ---
 
