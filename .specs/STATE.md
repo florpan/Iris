@@ -23,6 +23,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Image Detail** (`/image/:id`) — full metadata panel, GPS mini-map, tagging, keyboard navigation between images; accessible as modal overlay or deep link; displays full-resolution original images from source folders with organized metadata sections for camera info, file details, location, and IPTC data; includes zoom/pan support and RAW file preview handling
 - **Map View** — Leaflet map showing geotagged images with marker clustering
 - **Timeline View** — images grouped by date
+- **Stats Dashboard** — collection overview with total images, breakdown by format, date range span, most-used camera/lens, and storage size metrics
 
 ## API Surface
 - **Health** (`/api/health`) — readiness check
@@ -36,7 +37,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Sync** (`/api/sync`) — trigger scans, view sync run history and status per source; incremental sync with change detection
 - **Stats** (`/api/stats`) — dashboard statistics (counts, storage, camera/lens breakdowns)
 - **Search** (`/api/search`) — full-text and metadata search with pagination; PostgreSQL full-text search with GIN indexes across filename, IPTC title/description/keywords, camera model, lens model, and tags; structured filtering for camera model, lens, date range, file format, dimensions, file size; combined text and filter queries; result sorting by relevance, date, name, size; autocomplete suggestions for camera and lens values
-- **Facets** (`/api/facets`) — aggregated filter values (cameras, lenses, dates, tags, mime types)
+- **Facets** (`/api/facets`) — aggregated filter values (cameras, lenses, dates, tags, mime types); dynamic faceted queries with counts that update based on current filter selection; combinable facets for drilling down by metadata dimensions (camera + year, lens + format, etc.)
 - **Timeline** (`/api/timeline`) — images grouped by time period
 
 ## Data Model
@@ -62,6 +63,8 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Thumbnail regeneration** — change thumbnail format/size settings -> trigger regeneration -> all thumbnails rebuilt with new settings
 - **Scheduled sync** — background sync engine runs on configurable interval -> incrementally scans sources for changes -> processes new/modified files, marks removed files as missing -> progress visible in UI with sync history
 - **Bulk operations** — select multiple images using checkboxes in grid view -> Select All/None controls or keyboard shortcuts (Ctrl+A, Shift+click for range selection) -> bulk action toolbar appears -> apply batch operations like adding/removing tags -> progress feedback and error handling for failed operations
+- **Faceted browsing** — explore collection by metadata dimensions -> select camera model facet to see all cameras with image counts -> choose lens facet to drill down by lens -> select year/month to filter by date -> facet counts update dynamically based on current selection -> combined facets produce refined results in thumbnail grid
+- **Stats overview** — view stats dashboard for collection overview -> see total images, format breakdown, date range span, most-used camera/lens, storage size
 
 ## External Integrations
 - None (fully self-hosted, no external API calls)
@@ -72,4 +75,3 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - No image editing or RAW processing
 - Custom routing (pushState-based) rather than a router library
 - Docker compose only provides PostgreSQL; the app itself runs directly via Bun
-- One feature is spec'd but not yet implemented: empty state/loading screens
