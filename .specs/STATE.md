@@ -29,11 +29,12 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Config** (`/api/config`) — application settings (work dir, thumbnail format)
 - **Sources** (`/api/sources`) — CRUD for source folders (register, enable/disable, list)
 - **Images** (`/api/images`) — list/get images with pagination, filtering, sorting; bulk selection support
+- **Image Serving** (`/api/images/:id/original`) — stream original images from source folders with RAW preview support for non-JPEG formats
+- **Thumbnails** (`/api/thumbnails`, `/api/images/:id/thumb`) — serve generated thumbnail files with caching headers
 - **Folders** (`/api/folders`) — folder tree listing and contents for folder-based navigation
 - **Tags** (`/api/tags`) — tag CRUD, rename, merge, bulk delete, import from IPTC; per-image tag assignment (`/api/images/:id/tags`)
 - **Sync** (`/api/sync`) — trigger scans, view sync run history and status per source
 - **Stats** (`/api/stats`) — dashboard statistics (counts, storage, camera/lens breakdowns)
-- **Thumbnails** (`/api/thumbnails`) — serve generated thumbnail files
 - **Search** (`/api/search`) — full-text and metadata search with pagination
 - **Facets** (`/api/facets`) — aggregated filter values (cameras, lenses, dates, tags, mime types)
 - **Timeline** (`/api/timeline`) — images grouped by time period
