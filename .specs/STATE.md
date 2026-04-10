@@ -20,7 +20,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Search** (`/search`) — text search with metadata filters
 - **Browse** (`/browse`) — browse/explore mode
 - **Tags** (`/tags`) — tag management: create, rename, merge, delete, bulk operations, import from IPTC keywords; audit log
-- **Image Detail** (`/image/:id`) — full metadata panel, GPS mini-map, tagging, keyboard navigation between images; accessible as modal overlay or deep link
+- **Image Detail** (`/image/:id`) — full metadata panel, GPS mini-map, tagging, keyboard navigation between images; accessible as modal overlay or deep link; displays full-resolution original images from source folders with organized metadata sections for camera info, file details, location, and IPTC data; includes zoom/pan support and RAW file preview handling
 - **Map View** — Leaflet map showing geotagged images with marker clustering
 - **Timeline View** — images grouped by date
 
@@ -53,7 +53,7 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - **Add source and sync** — register a folder path as source -> trigger sync -> scanner walks filesystem, extracts metadata with exifr, generates thumbnails with sharp -> images appear in library
 - **Browse by folder** — navigate folder tree -> select subfolder -> view paginated image grid for that folder; use sidebar tree navigation with image counts to explore directory structure, adjust grid density and sorting options
 - **Search images** — enter text query and/or metadata filters -> results displayed in grid with pagination
-- **View image detail** — click image in any grid -> modal/deep-link detail view with full metadata, GPS map, tags -> keyboard arrow navigation between images
+- **View image detail** — click image in any grid -> modal/deep-link detail view with full metadata, GPS map, tags -> keyboard arrow navigation between images; full-resolution image display with organized metadata sections (camera, file, location, IPTC); zoom/pan support for large images; RAW files show embedded JPEG preview
 - **Tag images** — open image detail -> add/remove tags; or use bulk selection in grid -> apply tags to multiple images
 - **Manage tags** — go to tag management page -> rename, merge, delete tags; import IPTC keywords as tags; view audit log
 - **Filter by facets** — use facet panel to filter by camera, lens, date range, tags, file type
@@ -71,4 +71,4 @@ Iris is a self-hosted image search and organizer. Users register local filesyste
 - No image editing or RAW processing
 - Custom routing (pushState-based) rather than a router library
 - Docker compose only provides PostgreSQL; the app itself runs directly via Bun
-- Two features are spec'd but not yet implemented: empty state/loading screens and missing file status indicators
+- One feature is spec'd but not yet implemented: empty state/loading screens
