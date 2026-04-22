@@ -1,10 +1,9 @@
 project: Iris
-description: Self-hosted image search and organizer with metadata extraction, thumbnails, and smart browsing
+description: Self-hosted image search and organizer with metadata extraction,
+  thumbnails, and smart browsing
 spec_dir: .specs/features
-
 templates:
   - feature
-
 standards:
   techstack:
     frontend: React 19, Vite, Tailwind CSS, shadcn/ui
@@ -29,3 +28,5 @@ standards:
     require_acceptance_criteria: true
     require_technical_design: false
     max_tasks_per_feature: 10
+  assumptions:
+    - No authentication or login required — Iris runs locally for a single user
