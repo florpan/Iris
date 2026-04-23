@@ -12,6 +12,11 @@ standards:
     database: PostgreSQL, Drizzle ORM
     maps: Leaflet
     images: sharp (thumbnails/conversion), exifr (metadata extraction)
+
+  personas:
+    - name: "User"
+      description: "A single user sets up Iris, syncs their photo collection, and explores/organizes their images through browsing, searching, tagging, and map/timeline views."
+
   conventions:
     prefer:
       - Single-user application, no auth/roles
