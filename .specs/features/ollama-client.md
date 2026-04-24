@@ -1,7 +1,7 @@
 ---
 id: ollama-client
 title: Ollama Client
-status: draft
+status: ready
 milestone: smart
 priority: high
 handoff: single

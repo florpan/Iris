@@ -1,7 +1,7 @@
 ---
 id: admin-settings
 title: Admin Settings Page
-status: draft
+status: ready
 milestone: smart
 priority: high
 handoff: single

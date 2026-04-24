@@ -1,7 +1,7 @@
 ---
 id: semantic-image-search
 title: Semantic Image Search
-status: draft
+status: ready
 milestone: smart
 priority: medium
 handoff: single

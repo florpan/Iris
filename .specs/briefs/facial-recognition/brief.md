@@ -1,19 +1,11 @@
----
-id: facial-recognition
-title: Facial Recognition
-status: ready
-milestone: smart
-priority: medium
-handoff: single
-depends_on: ollama-client, admin-settings
----
+# Implementation Brief: Facial Recognition
 
-## Overview
+> **Implement this feature using the Waymark workflow.** Read `.specs/agents.md` for the full process. You MUST: update the spec status to `in-progress`, mark tasks `[x]` as you complete them, verify acceptance criteria, write an implementation summary to `.specs/briefs/facial-recognition/implementation-summary.md`, and update status to `complete` when done.
 
+## What to Build
 Detect and recognize faces in images using Ollama-hosted vision models. Allow users to identify people by name, search for images containing specific individuals, and browse photos by detected faces. Uses a separate Ollama instance for GPU-accelerated inference.
 
 ## Requirements
-
 - Detect faces in images during sync process using Ollama vision models
 - Extract face embeddings for similarity matching
 - Allow users to assign names to detected faces
@@ -26,7 +18,6 @@ Detect and recognize faces in images using Ollama-hosted vision models. Allow us
 - Face bounding box storage for UI display
 
 ## Technical Design
-
 **Ollama Integration:**
 - Separate Ollama instance running vision-capable models (llava, bakllava, or custom face detection models)
 - Uses shared Ollama client from `ollama-client` feature
@@ -51,28 +42,18 @@ Detect and recognize faces in images using Ollama-hosted vision models. Allow us
 - GET /api/images/person/:id - images containing specific person
 
 ## Acceptance Criteria
-
-- [ ] Face detection runs automatically during image sync
-- [ ] Faces are detected with bounding boxes and confidence scores
-- [ ] Similar faces are automatically clustered together
-- [ ] Users can assign names to face clusters
-- [ ] Search returns images containing named persons
-- [ ] Person browsing shows all photos of an individual
-- [ ] Face data can be deleted for privacy
-- [ ] System handles images with multiple faces
-- [ ] Configurable confidence thresholds work correctly
-- [ ] Face detection works with Ollama API integration
+Defined in `.specs/features/facial-recognition.md` § Acceptance Criteria. Mark them `[x]` in the spec file as you verify them.
 
 ## Tasks
+Defined in `.specs/features/facial-recognition.md` § Tasks. Mark each `[x]` in the spec file immediately after completing it.
 
-- [ ] Create faces and persons database tables | backend, database
-- [ ] Add face detection to image sync pipeline | backend, ai
-- [ ] Build face embedding similarity clustering | backend, ai
-- [ ] Create person management API endpoints | backend
-- [ ] Build person assignment and merging UI | frontend
-- [ ] Add person search to main search interface | frontend
-- [ ] Create person browsing page with photo grid | frontend
-- [ ] Add face detection settings panel to Face Detection tab in admin settings | frontend
+## Context
+- Dependencies:
+  - ⏳ Ollama Client (ollama-client) — ready
+  - ⏳ Admin Settings Page (admin-settings) — ready
 
-## Open Questions
-
+## Constraints
+### DO NOT implement (planned features — out of scope)
+- Ollama Client (ollama-client)
+- Semantic Image Search (semantic-image-search)
+- Admin Settings Page (admin-settings)
