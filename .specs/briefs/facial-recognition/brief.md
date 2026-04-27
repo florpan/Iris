@@ -54,6 +54,6 @@ Defined in `.specs/features/facial-recognition.md` § Tasks. Mark each `[x]` in 
 
 ## Constraints
 ### DO NOT implement (planned features — out of scope)
-- Ollama Client (ollama-client)
 - Semantic Image Search (semantic-image-search)
 - Admin Settings Page (admin-settings)
+- Ollama Client (ollama-client)
